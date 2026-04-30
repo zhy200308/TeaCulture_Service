@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,31 +43,33 @@ public class AdminUserController {
                                                                @RequestParam(required = false) Integer status,
                                                                @RequestParam(defaultValue = "1") Long pageNum,
                                                                @RequestParam(defaultValue = "20") Long pageSize) {
-        log.info("判断权限");
         if (!UserContext.isAdmin()) {
-            log.error("无权限");
             return ApiResponse.forbidden("无权限");
         }
 
-        Page<SysUser> page = sysUserService.page(new Page<>(pageNum, pageSize),
-                new LambdaQueryWrapper<SysUser>()
-                        .eq(SysUser::getDeleted, false)
-                        .eq(role != null && !role.isBlank(), SysUser::getRole, role)
-                        .eq(status != null, SysUser::getStatus, status == 1)
-                        .and(keyword != null && !keyword.isBlank(), w -> w.like(SysUser::getUsername, keyword).or().like(SysUser::getNickname, keyword))
-                        .orderByDesc(SysUser::getCreateTime));
-        //打印获取到的数据
-        log.info("用户数据：{}",page);
-        List<Map<String, Object>> records = page.getRecords().stream().map(u -> Map.<String, Object>of(
-                "id", u.getId(),
-                "username", u.getUsername(),
-                "nickname", u.getNickname(),
-                "role", u.getRole(),
-                "status", Boolean.TRUE.equals(u.getStatus()) ? 1 : 0,
-                "avatar", u.getAvatar(),
-                "tag", u.getTag(),
-                "description", u.getDescription()
-        )).toList();
+        LambdaQueryWrapper<SysUser> qw = new LambdaQueryWrapper<SysUser>()
+                .eq(SysUser::getDeleted, false)
+                .eq(role != null && !role.isBlank(), SysUser::getRole, role.trim())
+                .eq(status != null, SysUser::getStatus, status == 1)
+                .and(keyword != null && !keyword.isBlank(),
+                        w -> w.like(SysUser::getUsername, keyword).or().like(SysUser::getNickname, keyword))
+                .orderByDesc(SysUser::getCreateTime);
+
+        Page<SysUser> page = sysUserService.page(new Page<>(pageNum, pageSize), qw);
+        log.info("用户列表查询完成 total={}, records={}", page.getTotal(), page.getRecords().size());
+
+        List<Map<String, Object>> records = page.getRecords().stream().map(u -> {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", u.getId());
+            m.put("username", u.getUsername());
+            m.put("nickname", u.getNickname());
+            m.put("role", u.getRole());
+            m.put("status", Boolean.TRUE.equals(u.getStatus()) ? 1 : 0);
+            m.put("avatar", u.getAvatar());
+            m.put("tag", u.getTag());
+            m.put("description", u.getDescription());
+            return m;
+        }).toList();
 
         PageResponse<Map<String, Object>> resp = new PageResponse<Map<String, Object>>()
                 .setRecords(records)
