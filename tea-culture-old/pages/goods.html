@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>好物推荐</title>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/goods.css">
+    <script src="../assets/goods.js" defer></script>
+    <script src="../assets/validator.js"></script>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-leaf"></i>
+           
+            </div>
+            <nav class="nav-menu">
+                <a href="../index.html">首页</a>
+                <a href="./basic.html">基础茶识</a>
+                <a href="./advanced.html">进阶专题</a>
+                <a href="./scenario.html">场景教程</a>
+                <a href="./tea-food.html">茶食搭配</a>
+                <a href="./goods.html" class="active">好物推荐</a>
+            </nav>
+        </div>
+    </header>
+   
+    <div class="container">
+        <div class="goods-title">
+            <h2>茶文化好物推荐</h2>
+            <p>精选高性价比茶具、茶叶，提升饮茶体验</p>
+        </div>
+
+        <div class="goods-tabs">
+            <div class="goods-btn active" data-goods="all">全部好物</div>
+            <div class="goods-btn" data-goods="tea-set">茶具</div>
+            <div class="goods-btn" data-goods="tea-leaf">茶叶</div>
+            <div class="goods-btn" data-goods="accessory">茶配件</div>
+        </div>
+
+        <div class="goods-list" id="goodsList">
+            <div class="goods-card" data-goods="tea-set">
+                <div class="goods-card-img">
+                    <img src="../images/6.png" alt="白瓷盖碗">
+                </div>
+                <div class="goods-card-content">
+                    <span class="goods-tag">茶具</span>
+                    <h3>手工白瓷盖碗</h3>
+                    <p class="goods-desc">精选高岭土烧制，薄胎透光，不吸味，适合冲泡各类茶叶，手感温润，易清洗。</p>
+                    <div class="goods-price">¥89.00</div>
+                    <div class="detail-btn" onclick="openModal('tea-set-bowl')">查看详情</div>
+                </div>
+            </div>
+
+            <div class="goods-card" data-goods="tea-leaf">
+                <div class="goods-card-img">
+                    <img src="../images/6.1.png" alt="明前龙井">
+                </div>
+                <div class="goods-card-content">
+                    <span class="goods-tag">茶叶</span>
+                    <h3>明前龙井新茶</h3>
+                    <p class="goods-desc">核心产区采摘，一芽一叶，豆香浓郁，口感鲜爽回甘，绿茶中的经典款。</p>
+                    <div class="goods-price">¥198.00/50g</div>
+                    <div class="detail-btn" onclick="openModal('tea-leaf-longjing')">查看详情</div>
+                </div>
+            </div>
+
+            <div class="goods-card" data-goods="accessory">
+                <div class="goods-card-img">
+                    <img src="../images/6.2.png" alt="纯棉茶巾">
+                </div>
+                <div class="goods-card-content">
+                    <span class="goods-tag">茶配件</span>
+                    <h3>纯棉吸水茶巾</h3>
+                    <p class="goods-desc">加厚纯棉材质，吸水性强，不掉毛，可擦拭茶盘水渍，耐磨耐用，多款花色可选。</p>
+                    <div class="goods-price">¥15.90/条</div>
+                    <div class="detail-btn" onclick="openModal('accessory-towel')">查看详情</div>
+                </div>
+            </div>
+
+            <div class="goods-card" data-goods="tea-set">
+                <div class="goods-card-img">
+                    <img src="../images/6.3.png" alt="紫砂小壶">
+                </div>
+                <div class="goods-card-content">
+                    <span class="goods-tag">茶具</span>
+                    <h3>宜兴紫砂小壶</h3>
+                    <p class="goods-desc">原矿紫泥制作，120ml容量，适合单人饮茶，透气性佳，越养越润，适配乌龙茶、普洱茶。</p>
+                    <div class="goods-price">¥168.00</div>
+                    <div class="detail-btn" onclick="openModal('tea-set-zisha')">查看详情</div>
+                </div>
+            </div>
+
+            <div class="goods-card" data-goods="tea-leaf">
+                <div class="goods-card-img">
+                    <img src="../images/6.5.png" alt="正山小种">
+                </div>
+                <div class="goods-card-content">
+                    <span class="goods-tag">茶叶</span>
+                    <h3>正山小种红茶</h3>
+                    <p class="goods-desc">武夷山核心产区，松烟香明显，口感甜醇温润，暖胃护胃，适合日常饮用。</p>
+                    <div class="goods-price">¥128.00/100g</div>
+                    <div class="detail-btn" onclick="openModal('tea-leaf-lapsang')">查看详情</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+</body>
+</html>

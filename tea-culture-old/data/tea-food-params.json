@@ -1,0 +1,30 @@
+{
+  "green": {
+    "teaType": "绿茶",
+    "waterTemp": "80℃",
+    "amount": "3g",
+    "brewTime": "2分钟",
+    "note": "建议选用透明玻璃杯，先注水后投茶，便于观赏茶叶舒展，水温不宜过高"
+  },
+  "black": {
+    "teaType": "红茶",
+    "waterTemp": "90℃",
+    "amount": "4g",
+    "brewTime": "3分钟",
+    "note": "推荐使用白瓷杯或马克杯，可适当延长闷泡时间以增强甜醇口感"
+  },
+  "oolong": {
+    "teaType": "乌龙茶",
+    "waterTemp": "100℃",
+    "amount": "7g",
+    "brewTime": "1分钟(首泡洗茶）",
+    "note": "建议使用盖碗或紫砂壶,沸水高冲激发香气,首泡快速洗茶,后续每泡增加10-15秒"
+  },
+  "white": {
+    "teaType": "白茶",
+    "waterTemp": "90℃",
+    "amount": "5g",
+    "brewTime": "5分钟",
+    "note": "可用玻璃杯或保温杯闷泡，新茶水温稍低，老白茶可用沸水冲泡"
+  }
+}

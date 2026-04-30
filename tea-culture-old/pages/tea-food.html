@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>茶食搭配</title>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="../assets/mqtt-sim.js"></script>
+    <script src="../assets/validator.js"></script>
+    <link rel="stylesheet" href="../assets/tea-food.css">
+    <script src="../assets/tea-food.js" defer></script>
+   
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-leaf"></i>
+          
+            </div>
+            <nav class="nav-menu">
+                <a href="../index.html">首页</a>
+                <a href="./basic.html">基础茶识</a>
+                <a href="./advanced.html">进阶专题</a>
+                <a href="./scenario.html">场景教程</a>
+                <a href="./tea-food.html" class="active">茶食搭配</a>
+                <a href="./goods.html">好物推荐</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="food-title">
+            <h2>茶食搭配指南</h2>
+            <p>选对茶食搭配，让茶香与食味相得益彰</p>
+        </div>
+
+        <div class="device-status-bar">
+            <span>智能茶器：</span>
+            <span id="deviceStatusText">离线</span>
+            <span class="status-indicator" id="deviceStatusIndicator"></span>
+        </div>
+
+        <div class="tea-tabs">
+            <div class="tea-btn active" data-tea="all">全部茶类</div>
+            <div class="tea-btn" data-tea="green">绿茶</div>
+            <div class="tea-btn" data-tea="black">红茶</div>
+            <div class="tea-btn" data-tea="oolong">乌龙茶</div>
+            <div class="tea-btn" data-tea="white">白茶</div>
+        </div>
+
+        <div class="match-list" id="matchList">
+            <div class="match-card" data-tea="green">
+                <div class="match-card-img">
+                    <img src="../images/5.jpg" alt="绿茶+绿豆糕">
+                </div>
+                <div class="match-card-content">
+                    <span class="tea-tag">绿茶</span>
+                    <h3>绿茶 + 绿豆糕</h3>
+                    <p class="match-desc">绿茶鲜爽解腻，搭配清甜绿豆糕，中和甜腻感，口感清爽，是夏季绝佳搭配。</p>
+                    <div class="detail-btn" onclick="window.teaFoodOpenModal('green-bean')">查看详情</div>
+                </div>
+            </div>
+
+            <div class="match-card" data-tea="black">
+                <div class="match-card-img">
+                    <img src="../images/5.1.jpg" alt="红茶+司康">
+                </div>
+                <div class="match-card-content">
+                    <span class="tea-tag">红茶</span>
+                    <h3>红茶 + 黄油司康</h3>
+                    <p class="match-desc">红茶甜醇温润，搭配奶香司康，中和油腻感，口感醇厚，适合早餐或下午茶。</p>
+                    <div class="detail-btn" onclick="window.teaFoodOpenModal('black-scone')">查看详情</div>
+                </div>
+            </div>
+
+            <div class="match-card" data-tea="oolong">
+                <div class="match-card-img">
+                    <img src="../images/5.2.jpg" alt="乌龙茶+坚果">
+                </div>
+                <div class="match-card-content">
+                    <span class="tea-tag">乌龙茶</span>
+                    <h3>乌龙茶 + 盐焗坚果</h3>
+                    <p class="match-desc">乌龙茶香气高扬，搭配咸香坚果，解腻增香，口感丰富，适合休闲小食。</p>
+                    <div class="detail-btn" onclick="window.teaFoodOpenModal('oolong-nut')">查看详情</div>
+                </div>
+            </div>
+
+            <div class="match-card" data-tea="white">
+                <div class="match-card-img">
+                    <img src="../images/5.3.jpg" alt="白茶+桂花糕">
+                </div>
+                <div class="match-card-content">
+                    <span class="tea-tag">白茶</span>
+                    <h3>白茶 + 桂花糕</h3>
+                    <p class="match-desc">白茶清甜淡雅，搭配桂花糕的桂花香，香气交融，口感温润，四季皆宜。</p>
+                    <div class="detail-btn" onclick="window.teaFoodOpenModal('white-osmanthus')">查看详情</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+</body>
+</html>
