@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tea.teaculture_service.dto.ApiResponse;
 import com.tea.teaculture_service.dto.PageResponse;
+import com.tea.teaculture_service.dto.common.IdListRequest;
 import com.tea.teaculture_service.dto.topic.TopicListItem;
 import com.tea.teaculture_service.dto.topic.TopicUpsertRequest;
 import com.tea.teaculture_service.entity.TeaTopic;
@@ -155,5 +156,16 @@ public class TopicController {
         teaTopicService.removeById(id);
         return ApiResponse.ok();
     }
-}
 
+    @PostMapping("/batch-delete")
+    public ApiResponse<Void> batchDelete(@RequestBody IdListRequest req) {
+        if (!UserContext.isAdmin()) {
+            return ApiResponse.forbidden("无权限");
+        }
+        if (req == null || req.getIds() == null || req.getIds().isEmpty()) {
+            return ApiResponse.badRequest("ids不能为空");
+        }
+        teaTopicService.removeByIds(req.getIds());
+        return ApiResponse.ok();
+    }
+}

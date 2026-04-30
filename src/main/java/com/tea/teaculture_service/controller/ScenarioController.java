@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tea.teaculture_service.dto.ApiResponse;
 import com.tea.teaculture_service.dto.PageResponse;
+import com.tea.teaculture_service.dto.common.IdListRequest;
 import com.tea.teaculture_service.dto.scenario.ScenarioDetailResponse;
 import com.tea.teaculture_service.dto.scenario.ScenarioUpsertRequest;
 import com.tea.teaculture_service.entity.TeaBrewingParam;
@@ -35,12 +36,14 @@ public class ScenarioController {
 
     @GetMapping("/list")
     public ApiResponse<PageResponse<TeaScenario>> list(@RequestParam(required = false) String scenarioType,
+                                                      @RequestParam(required = false) String keyword,
                                                       @RequestParam(defaultValue = "1") Long pageNum,
                                                       @RequestParam(defaultValue = "10") Long pageSize) {
         Page<TeaScenario> page = teaScenarioService.page(new Page<>(pageNum, pageSize),
                 new LambdaQueryWrapper<TeaScenario>()
                         .eq(TeaScenario::getDeleted, false)
                         .eq(scenarioType != null && !scenarioType.isBlank(), TeaScenario::getScenarioType, scenarioType)
+                        .and(keyword != null && !keyword.isBlank(), w -> w.like(TeaScenario::getTitle, keyword).or().like(TeaScenario::getSummary, keyword))
                         .orderByAsc(TeaScenario::getSortOrder)
                         .orderByDesc(TeaScenario::getUpdateTime));
         PageResponse<TeaScenario> resp = new PageResponse<TeaScenario>()
@@ -131,5 +134,16 @@ public class ScenarioController {
         teaScenarioService.removeById(id);
         return ApiResponse.ok();
     }
-}
 
+    @PostMapping("/batch-delete")
+    public ApiResponse<Void> batchDelete(@RequestBody IdListRequest req) {
+        if (!UserContext.isAdmin()) {
+            return ApiResponse.forbidden("无权限");
+        }
+        if (req == null || req.getIds() == null || req.getIds().isEmpty()) {
+            return ApiResponse.badRequest("ids不能为空");
+        }
+        teaScenarioService.removeByIds(req.getIds());
+        return ApiResponse.ok();
+    }
+}

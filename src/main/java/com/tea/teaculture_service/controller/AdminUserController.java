@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tea.teaculture_service.dto.ApiResponse;
 import com.tea.teaculture_service.dto.PageResponse;
 import com.tea.teaculture_service.dto.admin.AdminUserUpdateRequest;
+import com.tea.teaculture_service.dto.common.IdListRequest;
 import com.tea.teaculture_service.entity.SysUser;
 import com.tea.teaculture_service.service.SysUserService;
 import com.tea.teaculture_service.utils.UserContext;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -105,5 +107,16 @@ public class AdminUserController {
         sysUserService.removeById(id);
         return ApiResponse.ok();
     }
-}
 
+    @PostMapping("/batch-delete")
+    public ApiResponse<Void> batchDelete(@RequestBody IdListRequest req) {
+        if (!UserContext.isAdmin()) {
+            return ApiResponse.forbidden("无权限");
+        }
+        if (req == null || req.getIds() == null || req.getIds().isEmpty()) {
+            return ApiResponse.badRequest("ids不能为空");
+        }
+        sysUserService.removeByIds(req.getIds());
+        return ApiResponse.ok();
+    }
+}

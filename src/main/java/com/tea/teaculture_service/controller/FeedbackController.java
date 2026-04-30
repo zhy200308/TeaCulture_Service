@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tea.teaculture_service.dto.ApiResponse;
 import com.tea.teaculture_service.dto.PageResponse;
+import com.tea.teaculture_service.dto.common.IdListRequest;
 import com.tea.teaculture_service.dto.feedback.FeedbackAdminItem;
 import com.tea.teaculture_service.dto.feedback.FeedbackReplyRequest;
 import com.tea.teaculture_service.dto.feedback.FeedbackSubmitRequest;
@@ -12,6 +13,7 @@ import com.tea.teaculture_service.entity.UserFeedback;
 import com.tea.teaculture_service.service.SysUserService;
 import com.tea.teaculture_service.service.UserFeedbackService;
 import com.tea.teaculture_service.utils.UserContext;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -124,5 +126,25 @@ public class FeedbackController {
         userFeedbackService.updateById(upd);
         return ApiResponse.ok();
     }
-}
 
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> delete(@PathVariable("id") Long id) {
+        if (!UserContext.isAdmin()) {
+            return ApiResponse.forbidden("无权限");
+        }
+        userFeedbackService.removeById(id);
+        return ApiResponse.ok();
+    }
+
+    @PostMapping("/admin/batch-delete")
+    public ApiResponse<Void> adminBatchDelete(@RequestBody IdListRequest req) {
+        if (!UserContext.isAdmin()) {
+            return ApiResponse.forbidden("无权限");
+        }
+        if (req == null || req.getIds() == null || req.getIds().isEmpty()) {
+            return ApiResponse.badRequest("ids不能为空");
+        }
+        userFeedbackService.removeByIds(req.getIds());
+        return ApiResponse.ok();
+    }
+}
