@@ -38,7 +38,7 @@ public class TeaKnowledge extends Model<TeaKnowledge> {
     private Long id;
 
 
-    @Schema(description = "业务标识（如"六大茶类"）")
+    @Schema(description = "业务标识（如六大茶类）")
     @TableField("knowledge_key")
     private String knowledgeKey;
 
