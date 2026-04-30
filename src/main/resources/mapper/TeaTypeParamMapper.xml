@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tea.teaculture_service.mapper.TeaTypeParamMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tea.teaculture_service.entity.TeaTypeParam">
+        <id column="id" property="id" />
+        <result column="tea_type_code" property="teaTypeCode" />
+        <result column="tea_type_name" property="teaTypeName" />
+        <result column="water_temp" property="waterTemp" />
+        <result column="amount" property="amount" />
+        <result column="brew_time" property="brewTime" />
+        <result column="note" property="note" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, tea_type_code, tea_type_name, water_temp, amount, brew_time, note, create_time, update_time, deleted
+    </sql>
+
+</mapper>

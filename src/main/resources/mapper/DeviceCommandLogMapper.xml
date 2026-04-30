@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tea.teaculture_service.mapper.DeviceCommandLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tea.teaculture_service.entity.DeviceCommandLog">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="device_id" property="deviceId" />
+        <result column="command_type" property="commandType" />
+        <result column="topic" property="topic" />
+        <result column="tea_type" property="teaType" />
+        <result column="amount" property="amount" />
+        <result column="water_temp" property="waterTemp" />
+        <result column="brew_time" property="brewTime" />
+        <result column="note" property="note" />
+        <result column="payload" property="payload" />
+        <result column="result" property="result" />
+        <result column="error_msg" property="errorMsg" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, device_id, command_type, topic, tea_type, amount, water_temp, brew_time, note, payload, result, error_msg, create_time
+    </sql>
+
+</mapper>

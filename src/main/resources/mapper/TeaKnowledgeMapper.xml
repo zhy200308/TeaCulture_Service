@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tea.teaculture_service.mapper.TeaKnowledgeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tea.teaculture_service.entity.TeaKnowledge">
+        <id column="id" property="id" />
+        <result column="knowledge_key" property="knowledgeKey" />
+        <result column="category_code" property="categoryCode" />
+        <result column="title" property="title" />
+        <result column="summary" property="summary" />
+        <result column="detail_content" property="detailContent" />
+        <result column="cover_image" property="coverImage" />
+        <result column="view_count" property="viewCount" />
+        <result column="status" property="status" />
+        <result column="sort_order" property="sortOrder" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, knowledge_key, category_code, title, summary, detail_content, cover_image, view_count, status, sort_order, create_time, update_time, deleted
+    </sql>
+
+</mapper>
