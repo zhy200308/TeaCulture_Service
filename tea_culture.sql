@@ -263,12 +263,12 @@ CREATE TABLE `tea_topic` (
 -- Records of tea_topic
 -- ----------------------------
 BEGIN;
-INSERT INTO `tea_topic` (`id`, `topic_code`, `title`, `summary`, `cover_image`, `detail_content`, `audio_url`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (1, 'process', '普洱茶熟茶发酵工艺', '普洱茶熟茶的人工渥堆发酵是核心工艺，控制温度、湿度和翻堆次数，决定熟茶的口感和品质。', NULL, '工艺核心：熟茶的核心是人工渥堆发酵，将晒青毛茶堆成高1.5-2米的茶堆，通过洒水增湿、控制温度（55-65℃），让茶叶微生物发酵。\n关键步骤：\n1. 备料：选用云南大叶种晒青毛茶，含水率控制在10%左右；\n2. 渥堆：堆茶洒水，覆盖湿布保温，温度超过65℃时翻堆降温；\n3. 翻堆：每隔7-10天翻堆一次，共翻堆5-8次；\n4. 出堆：发酵40-60天后出堆，摊晾至含水率12%以下；\n5. 陈化：出堆后陈放3-6个月，稳定口感。\n小贴士：发酵温度过高会导致熟茶有“渥堆味”；优质熟茶发酵后需陈化1年以上再饮用，口感更醇厚。', NULL, 0, 1, 1, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
-INSERT INTO `tea_topic` (`id`, `topic_code`, `title`, `summary`, `cover_image`, `detail_content`, `audio_url`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (2, 'region', '西湖龙井核心产区划分', '西湖龙井分为狮峰、龙井、云栖、虎跑、梅家坞五大核心产区，不同产区的龙井风味各有特色。', NULL, '五大核心产区：\n1. 狮峰产区：龙井村、狮峰山一带，香气高锐，口感醇厚；\n2. 龙井产区：翁家山、杨梅岭一带，色泽翠绿，口感鲜爽；\n3. 云栖产区：云栖竹径周边，滋味清甜，回甘明显；\n4. 虎跑产区：虎跑泉周边，嫩香持久，汤感顺滑；\n5. 梅家坞产区：梅家坞村，外形扁平，香气清鲜。\n产区差异原因：土壤（酸性红壤）、海拔、光照、降水等条件不同，导致内含物质比例差异，从而形成不同风味。\n小贴士：狮峰龙井价格最高，梅家坞龙井产量最大；购买时认准“西湖龙井地理标志”，避免买到仿品。', NULL, 0, 1, 2, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
-INSERT INTO `tea_topic` (`id`, `topic_code`, `title`, `summary`, `cover_image`, `detail_content`, `audio_url`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (3, 'taste', '乌龙茶香气品鉴技巧', '乌龙茶品鉴先闻干茶香，再闻湿茶香，最后品茶汤香，不同香型的乌龙茶品鉴重点不同。', NULL, '品鉴三步法：\n1. 干茶香：取3-5g干茶，轻摇茶荷，闻干茶的香型（清香型/浓香型/陈香型）；\n2. 湿茶香：洗茶后，盖碗盖焖10秒，开盖闻盖香，这是乌龙茶香气最浓郁的阶段；\n3. 茶汤香：品饮茶汤时，感受口腔中的香气，以及吞咽后鼻腔的回香。\n不同香型品鉴重点：\n• 清香型（铁观音）：兰花香、栀子香，清新雅致；\n• 浓香型（大红袍）：岩韵香、焦糖香，醇厚持久；\n• 陈香型（老乌龙）：陈香、药香，沉稳内敛。\n小贴士：品鉴时用白瓷盖碗更易凸显香气；品鉴前避免辛辣/重味食物，防止掩盖茶香。', NULL, 0, 1, 3, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
-INSERT INTO `tea_topic` (`id`, `topic_code`, `title`, `summary`, `cover_image`, `detail_content`, `audio_url`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (4, 'process', '白茶自然萎凋工艺', '白茶不炒不揉，核心是自然萎凋，控制萎凋时间和环境湿度，保留茶叶的天然营养和清甜口感。', NULL, '工艺核心：白茶工艺最简单，不炒不揉，核心是“自然萎凋”，通过缓慢失水让茶叶轻微发酵（约5-10%）。\n关键步骤：\n1. 采摘：采一芽一叶/一芽二叶的鲜叶，带白毫为佳；\n2. 摊晾：鲜叶均匀摊在竹匾上，厚度2-3cm；\n3. 萎凋：在20-25℃、湿度60-70%的环境下，自然萎凋48-72小时；\n4. 干燥：萎凋后用60℃低温烘干，含水率控制在8%以下。\n小贴士：湿度太高易发霉，太低易失水过快；萎凋期间可每天轻翻1-2次，保证受热均匀。', NULL, 0, 1, 4, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
-INSERT INTO `tea_topic` (`id`, `topic_code`, `title`, `summary`, `cover_image`, `detail_content`, `audio_url`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (5, 'health', '陈皮普洱·茶疗养生', '陈皮理气健脾，普洱熟茶暖胃降脂，二者结合成经典养生茶方，适合日常调理。', NULL, '茶疗原理：陈皮性温，理气健脾；普洱熟茶暖胃降脂。二者结合，可缓解消化不良、痰多咳嗽，尤其适合秋冬调理。\n典籍选读：《本草纲目》：“陈皮，苦能泄能燥，辛能散，温能和……同补药则补，同泻药则泻，同升药则升，同降药则降。”\n茶疗要点：\n1. 陈皮普洱兼具药食同源之性，是茶疗典范。\n2. 陈皮理气，普洱暖胃，二者相得益彰。\n3. 每日一杯，可助消化、祛湿气，温和调养。\n4. 冲泡时建议用100℃沸水，焖泡5分钟。\n小贴士：建议使用5年以上的新会陈皮与3年熟普搭配，口感更醇。', NULL, 0, 1, 5, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
-INSERT INTO `tea_topic` (`id`, `topic_code`, `title`, `summary`, `cover_image`, `detail_content`, `audio_url`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (6, 'culture', '唐宋茶器形制演变', '从唐代越窑青瓷茶瓯到宋代建窑黑釉盏，茶器形制随饮茶方式演变，折射出不同时代的审美风尚与文人意趣。', NULL, '唐代茶器：越窑青瓷与煮茶风尚。唐代盛行煮茶法，茶器以越窑青瓷为代表，陆羽《茶经》推崇“越州上”，青瓷茶瓯“类玉”“类冰”，与茶汤色泽相得益彰。典型器物包括茶鍑、茶铛、茶瓯、茶盏托等。\n宋代茶器：建窑黑釉与点茶美学。宋代点茶尚白，推崇“盏色贵青黑”，建窑黑釉盏盛行，兔毫、油滴、曜变等釉色与白色茶沫形成鲜明对比。\n文化意蕴：从唐代青瓷温润到宋代黑釉沉静，折射饮茶方式从煮茶到点茶的转变，也映射唐宋两代不同审美取向——唐尚丰腴华美，宋尚简约内敛。\n小贴士：鉴赏唐宋茶器可关注釉色、胎体、器型比例三大要素；当代茶器收藏中，宋代建盏残片仍具较高研究价值。', NULL, 0, 1, 6, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_topic` (`id`, `topic_code`, `title`, `summary`, `cover_image`, `detail_content`, `audio_url`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (1, 'process', '普洱茶熟茶发酵工艺', '普洱茶熟茶的核心是人工渥堆发酵，将晒青毛茶堆成高1.5-2米的茶堆，通过洒水增湿、控制温度（55-65℃），让茶叶微生物发酵。', NULL, '关键步骤：\n1. 备料：选用云南大叶种晒青毛茶，含水率控制在10%左右；\n2. 渥堆：堆茶洒水，覆盖湿布保温，温度超过65℃时翻堆降温；\n3. 翻堆：每隔7-10天翻堆一次，共翻堆5-8次；\n4. 出堆：发酵40-60天后出堆，摊晾至含水率12%以下；\n5. 陈化：出堆后陈放3-6个月，稳定口感。\n小贴士：发酵温度过高会导致熟茶有“渥堆味”；优质熟茶发酵后需陈化1年以上再饮用，口感更醇厚。', NULL, 0, 1, 1, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_topic` (`id`, `topic_code`, `title`, `summary`, `cover_image`, `detail_content`, `audio_url`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (2, 'region', '西湖龙井核心产区划分', '狮峰、龙井、云栖、虎跑、梅家坞五大核心产区各具风味：狮峰香高味醇，龙井鲜爽翠绿，云栖清甜回甘，虎跑汤感顺滑，梅家坞香清形美。', NULL, '产区差异原因：不同产区的土壤（酸性红壤）、海拔、光照、降水不同，导致茶叶内含物质比例差异，最终形成不同风味。\n小贴士：狮峰龙井价格最高，梅家坞龙井产量最大；购买时认准“西湖龙井地理标志”，避免买到仿品。', NULL, 0, 1, 2, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_topic` (`id`, `topic_code`, `title`, `summary`, `cover_image`, `detail_content`, `audio_url`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (3, 'taste', '乌龙茶香气品鉴技巧', '乌龙茶香气品鉴可用三步法：先闻干茶香，再闻湿茶香（盖香最浓），最后品茶汤香与回香。', NULL, '不同香型品鉴重点：\n• 清香型（铁观音）：兰花香、栀子香，清新雅致；\n• 浓香型（大红袍）：岩韵香、焦糖香，醇厚持久；\n• 陈香型（老乌龙）：陈香、药香，沉稳内敛。\n小贴士：品鉴时用白瓷盖碗，更易凸显香气；品鉴前避免吃辛辣/重味食物，防止掩盖茶香。', NULL, 0, 1, 3, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_topic` (`id`, `topic_code`, `title`, `summary`, `cover_image`, `detail_content`, `audio_url`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (4, 'process', '白茶自然萎凋工艺', '白茶工艺最简单，不炒不揉，核心是“自然萎凋”，通过缓慢失水让茶叶轻微发酵（约5-10%），保留天然营养与清甜口感。', NULL, '关键步骤：\n1. 采摘：采一芽一叶/一芽二叶的鲜叶，带白毫为佳；\n2. 摊晾：将鲜叶均匀摊在竹匾上，厚度2-3cm；\n3. 萎凋：在20-25℃、湿度60-70%的环境下，自然萎凋48-72小时；\n4. 干燥：萎凋后用60℃低温烘干，含水率控制在8%以下。\n小贴士：萎凋湿度太高易发霉，太低易失水过快；优质白茶萎凋时需每天轻翻1-2次，保证受热均匀。', NULL, 0, 1, 4, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_topic` (`id`, `topic_code`, `title`, `summary`, `cover_image`, `detail_content`, `audio_url`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (5, 'health', '陈皮普洱·茶疗养生', '陈皮性温，理气健脾；普洱熟茶暖胃降脂。二者结合，可缓解消化不良、痰多咳嗽，尤其适合秋冬调理。', NULL, '典籍选读：《本草纲目》“陈皮，苦能泄能燥，辛能散，温能和……同补药则补，同泻药则泻，同升药则升，同降药则降。”\n茶疗要点：\n1. 陈皮普洱兼具药食同源之性，是茶疗典范。\n2. 陈皮理气，普洱暖胃，二者相得益彰。\n3. 每日一杯，可助消化、祛湿气，温和调养。\n4. 冲泡时建议用100℃沸水，焖泡5分钟。\n小贴士：建议使用5年以上的新会陈皮与3年熟普搭配，口感更醇。', NULL, 0, 1, 5, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_topic` (`id`, `topic_code`, `title`, `summary`, `cover_image`, `detail_content`, `audio_url`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (6, 'culture', '唐宋茶器形制演变', '唐代盛行煮茶法，茶器以越窑青瓷为代表，陆羽《茶经》推崇“越州上”，青瓷茶瓯“类玉”“类冰”，与茶汤色泽相得益彰。', NULL, '宋代茶器：宋代点茶尚白，推崇“盏色贵青黑”，建窑黑釉盏因此盛行。兔毫、油滴、曜变等釉色变幻莫测，与白色茶沫形成鲜明对比。\n文化意蕴：从唐代青瓷温润到宋代黑釉沉静，折射出饮茶方式从煮茶到点茶的转变，也映射出唐宋两代不同的审美取向。\n小贴士：鉴赏唐宋茶器，可关注釉色、胎体、器型比例三大要素；当代茶器收藏中，宋代建盏残片仍具较高研究价值。', NULL, 0, 1, 6, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
 COMMIT;
 
 -- ----------------------------
@@ -371,6 +371,29 @@ CREATE TABLE `user_favorite` (
 
 -- ----------------------------
 -- Records of user_favorite
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for user_learning_record
+-- ----------------------------
+DROP TABLE IF EXISTS `user_learning_record`;
+CREATE TABLE `user_learning_record` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `user_id` bigint NOT NULL COMMENT '逻辑关联 sys_user.id（无外键）',
+  `target_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '学习类型：knowledge/topic/scenario/food',
+  `target_id` bigint NOT NULL COMMENT '目标ID（对应业务表主键）',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_target` (`target_type`,`target_id`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户学习记录表';
+
+-- ----------------------------
+-- Records of user_learning_record
 -- ----------------------------
 BEGIN;
 COMMIT;

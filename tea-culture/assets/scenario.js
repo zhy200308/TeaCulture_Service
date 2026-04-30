@@ -104,6 +104,7 @@ async function openScenarioModal(id) {
 
     bindSyncButton();
     appendFavoriteBtn(modalContent, 'scenario', id);
+    if (window.API && API.Learning) API.Learning.record('scenario', id).catch(() => {});
 }
 
 function renderScenarioDetail(scenario, param) {

@@ -36,6 +36,7 @@ function renderAdminSidebar() {
         {
             title: '管理菜单',
             items: [
+                { href: 'admin.html', icon: 'fas fa-gauge', text: '控制台' },
                 { href: 'admin-users.html', icon: 'fas fa-users', text: '用户管理' },
                 { href: 'admin-knowledge.html', icon: 'fas fa-book-open', text: '茶识管理' },
                 { href: 'admin-topic.html', icon: 'fas fa-layer-group', text: '专题管理' },

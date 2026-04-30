@@ -93,6 +93,7 @@ async function openTopicModal(id) {
         modalContent.innerHTML = renderTopicDetail(result.data);
         // 添加收藏按钮
         appendFavoriteBtn(modalContent, 'topic', id);
+        if (window.API && API.Learning) API.Learning.record('topic', id).catch(() => {});
     } else {
         modalContent.innerHTML = '<h3>内容加载失败</h3><p>请稍后重试</p>';
     }
@@ -110,6 +111,17 @@ function renderTopicDetail(data) {
     const classicTitle = classic ? resolveClassicTitle(classic) : '';
     const classicHtml = classic ? `<div class="classic-text"><h4>${escapeHtml(classicTitle)}</h4><p>${escapeHtml(classic)}</p></div>` : '';
 
+    const coreTitle = resolveCoreSectionTitle(data);
+    const summary = String(data?.summary || '').trim();
+    const coreHtml = summary
+        ? `
+            <div class="topic-section">
+                <h4>${escapeHtml(coreTitle)}</h4>
+                <p>${escapeHtml(summary)}</p>
+            </div>
+        `
+        : '';
+
     const sectionHtml = sections.map(s => `
         <div class="topic-section">
             <h4>${escapeHtml(s.title)}</h4>
@@ -122,6 +134,7 @@ function renderTopicDetail(data) {
     return `
         <h3>${title}</h3>
         ${img}
+        ${coreHtml}
         ${sectionHtml}
         ${classicHtml}
         ${audioHtml}
@@ -212,6 +225,16 @@ function resolveClassicTitle(text) {
     const m = String(text || '').match(/(《[^》]{1,30}》)/);
     if (m) return `典籍选读 · ${m[1]}`;
     return '典籍选读';
+}
+
+function resolveCoreSectionTitle(data) {
+    const title = String(data?.title || '');
+    if (title.includes('发酵') || title.includes('萎凋') || title.includes('工艺')) return '工艺核心';
+    if (title.includes('产区')) return '五大核心产区';
+    if (title.includes('品鉴')) return '品鉴三步法';
+    if (title.includes('茶疗')) return '茶疗原理';
+    if (title.includes('唐宋') || title.includes('茶器')) return '唐代茶器';
+    return '核心内容';
 }
 
 function appendFavoriteBtn(container, targetType, targetId) {

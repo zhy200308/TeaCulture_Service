@@ -1,0 +1,28 @@
+ .nav-right {
+     display: flex;
+     gap: 16px;
+     align-items: center;
+ }
+ 
+ .nav-user-text {
+     font-size: 14px;
+     color: #555;
+ }
+ 
+ .nav-btn {
+     background: transparent;
+     border: none;
+     outline: none;
+     font-size: 15px;
+     color: #555;
+     cursor: pointer;
+     padding: 0;
+     text-decoration: none;
+     display: inline-flex;
+     align-items: center;
+     gap: 6px;
+ }
+ 
+ .nav-btn:hover {
+     color: #8b5a2b;
+ }

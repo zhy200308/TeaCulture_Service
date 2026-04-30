@@ -141,6 +141,7 @@ async function openMatchModal(id) {
 
     bindSyncButton();
     appendFavoriteBtn(modalContent, 'food', id);
+    if (window.API && API.Learning) API.Learning.record('food', id).catch(() => {});
 }
 
 function renderMatchDetail(match) {

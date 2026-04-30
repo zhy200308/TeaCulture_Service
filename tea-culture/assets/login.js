@@ -52,13 +52,10 @@ async function handleLogin() {
     if (result.code === 200) {
         TokenManager.setToken(result.data.token);
         TokenManager.setUserInfo(result.data.userInfo);
-        alert('登录成功');
-        // 根据角色跳转
-        if (result.data.userInfo.role === 'admin') {
-            window.location.href = '../pages/admin.html';
-        } else {
-            window.location.href = '../index.html';
-        }
+        const u = result.data.userInfo || {};
+        alert(`欢迎你，${u.nickname || u.username || '茶友'}`);
+        if (u.role === 'admin') window.location.href = '../pages/admin.html';
+        else window.location.href = '../index.html';
     } else {
         alert(result.message || '登录失败');
     }

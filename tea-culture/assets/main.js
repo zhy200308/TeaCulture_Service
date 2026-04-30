@@ -81,14 +81,4 @@ if (searchInput) {
 }
 
 // ===================== 4. 退出登录 =====================
-document.addEventListener('DOMContentLoaded', () => {
-    const logoutBtn = document.querySelector('a[href*="login.html"]');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            await API.Auth.logout();
-            TokenManager.clear();
-            window.location.href = './pages/login.html';
-        });
-    }
-});
+ 

@@ -6,6 +6,7 @@
     <title>管理后台 - 茶文化服务平台</title>
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/admin-common.css">
+    <link rel="stylesheet" href="../assets/admin-dashboard.css">
 </head>
 <body>
 
@@ -30,9 +31,26 @@
 
     <main class="admin-main">
         <h2 class="page-title"><i class="fas fa-gauge"></i> 管理后台</h2>
-        <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
-            <div style="color:#666;line-height:1.8;">
-                请从左侧选择需要管理的模块。所有模块均支持分页、模糊搜索与批量删除；内容模块支持新增/编辑/删除。
+        <div class="dash-grid">
+            <div class="dash-card"><div class="label">用户数</div><div class="value" id="kpiUserCount">0</div></div>
+            <div class="dash-card"><div class="label">茶识数量</div><div class="value" id="kpiKnowledgeCount">0</div></div>
+            <div class="dash-card"><div class="label">专题数量</div><div class="value" id="kpiTopicCount">0</div></div>
+            <div class="dash-card"><div class="label">场景教程数量</div><div class="value" id="kpiScenarioCount">0</div></div>
+            <div class="dash-card"><div class="label">茶食搭配数量</div><div class="value" id="kpiFoodCount">0</div></div>
+        </div>
+
+        <div class="dash-panels">
+            <div class="dash-panel">
+                <h3>收藏统计</h3>
+                <div id="favChart"></div>
+                <div class="small-note" id="favNote"></div>
+            </div>
+            <div class="dash-panel">
+                <h3>学习记录（近7天）</h3>
+                <div id="learnChart"></div>
+                <div class="small-note">按天统计</div>
+                <h3 style="margin-top:14px;">学习记录（按模块）</h3>
+                <div id="learnTypeChart"></div>
             </div>
         </div>
     </main>
@@ -40,12 +58,7 @@
 
 <script src="../assets/api.js"></script>
 <script src="../assets/admin-common.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        if (!AdminCommon.requireAdmin()) return;
-        AdminCommon.bindAdminHeader();
-    });
-</script>
+<script src="../assets/admin-dashboard.js"></script>
 
 </body>
 </html>

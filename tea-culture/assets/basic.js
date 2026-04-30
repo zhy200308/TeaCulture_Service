@@ -119,6 +119,7 @@ async function showKnowledgeDetail(id) {
         modalContent.innerHTML = renderKnowledgeDetail(result.data);
         // 收藏按钮
         appendFavoriteBtn(modalContent, 'knowledge', id);
+        if (window.API && API.Learning) API.Learning.record('knowledge', id).catch(() => {});
     } else {
         modalContent.innerHTML = '<h3>内容加载失败</h3><p>请稍后重试</p>';
     }

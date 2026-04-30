@@ -19,15 +19,42 @@ const USER_INFO_KEY = 'tea_user_info';
 
 // ===================== Token 管理 =====================
 const TokenManager = {
-    getToken() { return localStorage.getItem(TOKEN_KEY); },
-    setToken(token) { localStorage.setItem(TOKEN_KEY, token); },
-    removeToken() { localStorage.removeItem(TOKEN_KEY); },
+    getToken() {
+        const s = sessionStorage.getItem(TOKEN_KEY);
+        if (s) return s;
+        const l = localStorage.getItem(TOKEN_KEY);
+        if (l) {
+            sessionStorage.setItem(TOKEN_KEY, l);
+            localStorage.removeItem(TOKEN_KEY);
+            return l;
+        }
+        return null;
+    },
+    setToken(token) {
+        sessionStorage.setItem(TOKEN_KEY, token);
+        localStorage.removeItem(TOKEN_KEY);
+    },
+    removeToken() {
+        sessionStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(TOKEN_KEY);
+    },
     getUserInfo() {
-        const info = localStorage.getItem(USER_INFO_KEY);
+        const info = sessionStorage.getItem(USER_INFO_KEY) || localStorage.getItem(USER_INFO_KEY);
+        if (!info) return null;
+        if (localStorage.getItem(USER_INFO_KEY)) {
+            sessionStorage.setItem(USER_INFO_KEY, info);
+            localStorage.removeItem(USER_INFO_KEY);
+        }
         return info ? JSON.parse(info) : null;
     },
-    setUserInfo(info) { localStorage.setItem(USER_INFO_KEY, JSON.stringify(info)); },
-    removeUserInfo() { localStorage.removeItem(USER_INFO_KEY); },
+    setUserInfo(info) {
+        sessionStorage.setItem(USER_INFO_KEY, JSON.stringify(info));
+        localStorage.removeItem(USER_INFO_KEY);
+    },
+    removeUserInfo() {
+        sessionStorage.removeItem(USER_INFO_KEY);
+        localStorage.removeItem(USER_INFO_KEY);
+    },
     clear() {
         this.removeToken();
         this.removeUserInfo();
@@ -524,6 +551,20 @@ const DeviceAPI = {
     }
 };
 
+// ===================== 9.1 学习记录 =====================
+const LearningAPI = {
+    record(targetType, targetId) {
+        return http.post('/learning/record', { targetType, targetId });
+    }
+};
+
+// ===================== 9.2 管理员 - 控制台 =====================
+const AdminDashboardAPI = {
+    stats() {
+        return http.get('/admin/dashboard/stats');
+    }
+};
+
 // ===================== 10. 管理员 - 用户管理 =====================
 const AdminUserAPI = {
     /**
@@ -718,9 +759,11 @@ window.API = {
     Favorite: FavoriteAPI,
     Feedback: FeedbackAPI,
     Device: DeviceAPI,
+    Learning: LearningAPI,
     AdminUser: AdminUserAPI,
     AdminFavorite: AdminFavoriteAPI,
     AdminDeviceCommand: AdminDeviceCommandAPI,
+    AdminDashboard: AdminDashboardAPI,
     AdminTeaCategory: AdminTeaCategoryAPI,
     AdminTopicCategory: AdminTopicCategoryAPI,
     AdminTeaWare: AdminTeaWareAPI,
