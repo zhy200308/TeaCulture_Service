@@ -26,10 +26,22 @@ function renderSiteHeader() {
 
     let rightHtml = `<a class="nav-btn" href="${base}pages/login.html"><i class="fas fa-user"></i> 登录 / 注册</a>`;
     if (isLoggedIn) {
-        const centerHref = user?.role === 'admin' ? `${base}pages/admin.html` : `${base}pages/user.html`;
+        const avatarUrl = normalizeImageUrl(user?.avatar);
+        const avatarHtml = avatarUrl
+            ? `<span class="nav-avatar"><img src="${avatarUrl}" alt="" onerror="this.style.display='none'"></span>`
+            : `<span class="nav-avatar"><i class="fas fa-user-circle"></i></span>`;
+
+        const userCenterHref = `${base}pages/user.html`;
+        const adminHref = `${base}pages/admin.html`;
+
+        const adminBtn = user?.role === 'admin'
+            ? `<a class="nav-btn" href="${adminHref}"><i class="fas fa-shield-halved"></i> 管理后台</a>`
+            : '';
+
         rightHtml = `
-            <span class="nav-user-text"><i class="fas fa-user-circle"></i> 欢迎你，${escapeHtml(nickname || '茶友')}</span>
-            <a class="nav-btn" href="${centerHref}"><i class="fas fa-id-card"></i> ${user?.role === 'admin' ? '管理后台' : '个人中心'}</a>
+            <span class="nav-user-text">${avatarHtml} 欢迎你，${escapeHtml(nickname || '茶友')}</span>
+            <a class="nav-btn" href="${userCenterHref}"><i class="fas fa-id-card"></i> 个人中心</a>
+            ${adminBtn}
             <a class="nav-btn" href="${base}pages/login.html" id="siteLogoutBtn"><i class="fas fa-right-from-bracket"></i> 退出登录</a>
         `;
     }
@@ -79,3 +91,11 @@ function escapeHtml(str) {
 }
 
 document.addEventListener('DOMContentLoaded', renderSiteHeader);
+
+function normalizeImageUrl(url) {
+    const u = String(url || '').trim();
+    if (!u) return '';
+    if (u.startsWith('./images/')) return `../images/${u.slice('./images/'.length)}`;
+    if (u.startsWith('/images/')) return `..${u}`;
+    return u;
+}

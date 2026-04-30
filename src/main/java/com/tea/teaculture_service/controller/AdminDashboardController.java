@@ -23,13 +23,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
 
 @RestController
 @RequestMapping("/admin/dashboard")
 @RequiredArgsConstructor
+@Slf4j
 public class AdminDashboardController {
 
     private final SysUserService sysUserService;
@@ -41,6 +44,7 @@ public class AdminDashboardController {
     private final UserLearningRecordService userLearningRecordService;
 
     @GetMapping("/stats")
+    @Transactional(readOnly = true)
     public ApiResponse<Map<String, Object>> stats() {
         if (!UserContext.isAdmin()) return ApiResponse.forbidden("无权限");
 
@@ -50,26 +54,39 @@ public class AdminDashboardController {
         long scenarioCount = teaScenarioService.count(new QueryWrapper<TeaScenario>().eq("deleted", 0));
         long foodCount = teaFoodMatchService.count(new QueryWrapper<TeaFoodMatch>().eq("deleted", 0));
 
-        List<Map<String, Object>> favoriteAgg = userFavoriteService.listMaps(new QueryWrapper<UserFavorite>()
-                .select("target_type as targetType", "count(*) as favoriteCount", "count(distinct user_id) as userCount")
-                .eq("deleted", 0)
-                .groupBy("target_type"));
+        List<Map<String, Object>> favoriteAgg;
+        try {
+            favoriteAgg = userFavoriteService.listMaps(new QueryWrapper<UserFavorite>()
+                    .select("target_type as targetType", "count(*) as favoriteCount", "count(distinct user_id) as userCount")
+                    .eq("deleted", 0)
+                    .groupBy("target_type"));
+        } catch (Exception e) {
+            log.error("dashboard favoriteAgg failed", e);
+            favoriteAgg = List.of();
+        }
 
         LocalDate startDay = LocalDate.now().minusDays(6);
         LocalDateTime startTime = startDay.atStartOfDay();
 
-        List<Map<String, Object>> learningAgg = userLearningRecordService.listMaps(new QueryWrapper<UserLearningRecord>()
-                .select("DATE(create_time) as day", "count(*) as cnt")
-                .eq("deleted", 0)
-                .ge("create_time", startTime)
-                .groupBy("DATE(create_time)")
-                .orderByAsc("day"));
-
-        List<Map<String, Object>> learningByType = userLearningRecordService.listMaps(new QueryWrapper<UserLearningRecord>()
-                .select("target_type as targetType", "count(*) as cnt")
-                .eq("deleted", 0)
-                .ge("create_time", startTime)
-                .groupBy("target_type"));
+        List<Map<String, Object>> learningAgg;
+        List<Map<String, Object>> learningByType;
+        try {
+            learningAgg = userLearningRecordService.listMaps(new QueryWrapper<UserLearningRecord>()
+                    .select("DATE_FORMAT(create_time,'%Y-%m-%d') as day", "count(*) as cnt")
+                    .eq("deleted", 0)
+                    .ge("create_time", startTime)
+                    .groupBy("DATE_FORMAT(create_time,'%Y-%m-%d')")
+                    .orderByAsc("day"));
+            learningByType = userLearningRecordService.listMaps(new QueryWrapper<UserLearningRecord>()
+                    .select("target_type as targetType", "count(*) as cnt")
+                    .eq("deleted", 0)
+                    .ge("create_time", startTime)
+                    .groupBy("target_type"));
+        } catch (Exception e) {
+            log.error("dashboard learningAgg failed", e);
+            learningAgg = List.of();
+            learningByType = List.of();
+        }
 
         Map<String, Object> resp = new LinkedHashMap<>();
         resp.put("userCount", userCount);
@@ -84,4 +101,3 @@ public class AdminDashboardController {
         return ApiResponse.ok(resp);
     }
 }
-
