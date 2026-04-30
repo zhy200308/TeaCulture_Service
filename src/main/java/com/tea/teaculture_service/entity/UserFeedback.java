@@ -65,7 +65,7 @@ public class UserFeedback extends Model<UserFeedback> {
 
     @Schema(description = "处理状态：0未处理 1处理中 2已处理")
     @TableField("status")
-    private Boolean status;
+    private Integer status;
 
 
     @Schema(description = "管理员回复")

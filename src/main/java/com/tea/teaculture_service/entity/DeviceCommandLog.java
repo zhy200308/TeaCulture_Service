@@ -90,7 +90,7 @@ public class DeviceCommandLog extends Model<DeviceCommandLog> {
 
     @Schema(description = "结果：0发送中 1成功 2失败")
     @TableField("result")
-    private Boolean result;
+    private Integer result;
 
 
     @Schema(description = "错误信息")
