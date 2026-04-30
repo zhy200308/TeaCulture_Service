@@ -5,7 +5,6 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.tea.teaculture_service.entity.TeaKnowledge">
         <id column="id" property="id" />
-        <result column="knowledge_key" property="knowledgeKey" />
         <result column="category_code" property="categoryCode" />
         <result column="title" property="title" />
         <result column="summary" property="summary" />
@@ -21,7 +20,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, knowledge_key, category_code, title, summary, detail_content, cover_image, view_count, status, sort_order, create_time, update_time, deleted
+        id, category_code, title, summary, detail_content, cover_image, view_count, status, sort_order, create_time, update_time, deleted
     </sql>
 
 </mapper>

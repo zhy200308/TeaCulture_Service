@@ -58,7 +58,7 @@ async function load() {
                 <td>${u.id}</td>
                 <td>${u.username || ''}</td>
                 <td>${u.nickname || ''}</td>
-                <td>${u.role === 'admin' ? '<span class="tag">admin</span>' : 'user'}</td>
+                <td>${u.role === 'admin' ? '<span class="tag">管理员</span>' : '<span class="tag">普通用户</span>'}</td>
                 <td>${u.status === 1 ? '<span class="tag">正常</span>' : '<span class="tag" style="background:#fff1f1;color:#ff5252;">禁用</span>'}</td>
                 <td>
                     <div class="row-actions">

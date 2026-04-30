@@ -86,7 +86,7 @@ COMMIT;
 DROP TABLE IF EXISTS `tea_brewing_param`;
 CREATE TABLE `tea_brewing_param` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `scenario_key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '逻辑关联 tea_scenario.scenario_key（无外键）',
+  `scenario_id` bigint NOT NULL COMMENT '逻辑关联 tea_scenario.id（无外键）',
   `tea_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '茶类（乌龙茶等）',
   `amount` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '投茶量（6g）',
   `water_temp` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '水温（100℃）',
@@ -96,17 +96,17 @@ CREATE TABLE `tea_brewing_param` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_scenario_key` (`scenario_key`)
+  UNIQUE KEY `uk_scenario_id` (`scenario_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='场景冲泡参数表';
 
 -- ----------------------------
 -- Records of tea_brewing_param
 -- ----------------------------
 BEGIN;
-INSERT INTO `tea_brewing_param` (`id`, `scenario_key`, `tea_type`, `amount`, `water_temp`, `brew_time`, `note`, `create_time`, `update_time`, `deleted`) VALUES (1, 'home-kungfu', '乌龙茶', '6g', '100℃', '8-10秒', '首泡快速洗茶，后续每泡可增加2秒，以充分释放茶香', '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
-INSERT INTO `tea_brewing_param` (`id`, `scenario_key`, `tea_type`, `amount`, `water_temp`, `brew_time`, `note`, `create_time`, `update_time`, `deleted`) VALUES (2, 'office-simple', '绿茶/红茶', '4g', '80℃ (绿茶) / 90℃ (红茶)', '2-3分钟', '建议使用马克杯冲泡，注意控制浸泡时间，避免茶汤过浓', '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
-INSERT INTO `tea_brewing_param` (`id`, `scenario_key`, `tea_type`, `amount`, `water_temp`, `brew_time`, `note`, `create_time`, `update_time`, `deleted`) VALUES (3, 'outdoor-portable', '白茶', '5g', '90℃', '5分钟', '可提前将热水装入保温杯，便于户外冲泡', '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
-INSERT INTO `tea_brewing_param` (`id`, `scenario_key`, `tea_type`, `amount`, `water_temp`, `brew_time`, `note`, `create_time`, `update_time`, `deleted`) VALUES (4, 'home-cold', '绿茶/乌龙茶', '9g', '常温', '4-6小时', '将密封容器放入冰箱冷藏4-6小时，冷泡口感清爽', '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_brewing_param` (`id`, `scenario_id`, `tea_type`, `amount`, `water_temp`, `brew_time`, `note`, `create_time`, `update_time`, `deleted`) VALUES (1, 1, '乌龙茶', '6g', '100℃', '8-10秒', '首泡快速洗茶，后续每泡可增加2秒，以充分释放茶香', '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_brewing_param` (`id`, `scenario_id`, `tea_type`, `amount`, `water_temp`, `brew_time`, `note`, `create_time`, `update_time`, `deleted`) VALUES (2, 2, '绿茶/红茶', '4g', '80℃ (绿茶) / 90℃ (红茶)', '2-3分钟', '建议使用马克杯冲泡，注意控制浸泡时间，避免茶汤过浓', '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_brewing_param` (`id`, `scenario_id`, `tea_type`, `amount`, `water_temp`, `brew_time`, `note`, `create_time`, `update_time`, `deleted`) VALUES (3, 3, '白茶', '5g', '90℃', '5分钟', '可提前将热水装入保温杯，便于户外冲泡', '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_brewing_param` (`id`, `scenario_id`, `tea_type`, `amount`, `water_temp`, `brew_time`, `note`, `create_time`, `update_time`, `deleted`) VALUES (4, 4, '绿茶/乌龙茶', '9g', '常温', '4-6小时', '将密封容器放入冰箱冷藏4-6小时，冷泡口感清爽', '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
 COMMIT;
 
 -- ----------------------------
@@ -143,21 +143,19 @@ COMMIT;
 DROP TABLE IF EXISTS `tea_food_match`;
 CREATE TABLE `tea_food_match` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `match_key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '业务标识（green-bean等）',
   `tea_type_code` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '逻辑关联 tea_type_param.tea_type_code（无外键）',
   `tea_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '茶名',
   `food_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '食物名',
   `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '完整标题（绿茶 + 绿豆糕）',
   `summary` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '卡片简述',
   `cover_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '封面图',
-  `detail_content` text COLLATE utf8mb4_unicode_ci COMMENT '详情HTML（含搭配理由/食用建议/小贴士）',
+  `detail_content` text COLLATE utf8mb4_unicode_ci COMMENT '详情内容（含搭配理由/食用建议/小贴士）',
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态',
   `sort_order` int NOT NULL DEFAULT '0' COMMENT '排序',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_match_key` (`match_key`),
   KEY `idx_tea_type` (`tea_type_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='茶食搭配表';
 
@@ -173,11 +171,10 @@ COMMIT;
 DROP TABLE IF EXISTS `tea_knowledge`;
 CREATE TABLE `tea_knowledge` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `knowledge_key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '业务标识（如"六大茶类"）',
   `category_code` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '逻辑关联 tea_category.category_code（无外键）',
   `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '标题',
   `summary` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '摘要描述（卡片desc）',
-  `detail_content` text COLLATE utf8mb4_unicode_ci COMMENT '详情HTML内容',
+  `detail_content` text COLLATE utf8mb4_unicode_ci COMMENT '详情内容',
   `cover_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '封面图URL',
   `view_count` int NOT NULL DEFAULT '0' COMMENT '浏览量',
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态：1已发布 0草稿',
@@ -186,7 +183,6 @@ CREATE TABLE `tea_knowledge` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_knowledge_key` (`knowledge_key`),
   KEY `idx_category` (`category_code`),
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='基础茶识表';
@@ -203,12 +199,11 @@ COMMIT;
 DROP TABLE IF EXISTS `tea_scenario`;
 CREATE TABLE `tea_scenario` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `scenario_key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '业务标识（home-kungfu等）',
   `scenario_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '场景类型：home/office/outdoor',
   `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '教程标题',
   `summary` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '简述',
   `cover_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '封面图',
-  `detail_content` text COLLATE utf8mb4_unicode_ci COMMENT '详情HTML（含工具/步骤/小贴士）',
+  `detail_content` text COLLATE utf8mb4_unicode_ci COMMENT '详情内容（含工具/步骤/小贴士）',
   `view_count` int NOT NULL DEFAULT '0' COMMENT '浏览量',
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态：1已发布 0草稿',
   `sort_order` int NOT NULL DEFAULT '0' COMMENT '排序',
@@ -216,16 +211,18 @@ CREATE TABLE `tea_scenario` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_scenario_key` (`scenario_key`),
   KEY `idx_scenario_type` (`scenario_type`),
   KEY `idx_status` (`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=2049863389741531139 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='场景教程表';
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='场景教程表';
 
 -- ----------------------------
 -- Records of tea_scenario
 -- ----------------------------
 BEGIN;
-INSERT INTO `tea_scenario` (`id`, `scenario_key`, `scenario_type`, `title`, `summary`, `cover_image`, `detail_content`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (2049863389741531138, 'wertyhj', 'home', '', 'wa4setdryftugyihuojipk', 'http://localhost:8080/api/upload/f7a6b0b9e11f4c10821b4b0b2e02a492.jpg', '5edr6ftyguihjok', 0, 1, 0, '2026-04-30 22:48:11', '2026-04-30 22:48:11', 0);
+INSERT INTO `tea_scenario` (`id`, `scenario_type`, `title`, `summary`, `cover_image`, `detail_content`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (1, 'home', '居家功夫茶冲泡', '在家用盖碗或紫砂壶冲泡乌龙茶，突出香气与层次。', NULL, '工具：盖碗/紫砂壶、茶海、公道杯、品茗杯。\n步骤：温具→投茶→润茶→正式冲泡→分汤品饮。\n提示：首泡快速出汤，后续每泡增加少许时间。', 0, 1, 1, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_scenario` (`id`, `scenario_type`, `title`, `summary`, `cover_image`, `detail_content`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (2, 'office', '办公室简易冲泡', '办公室用马克杯冲泡绿茶/红茶，简单快速。', NULL, '工具：马克杯/玻璃杯。\n步骤：注水→投茶→等待→饮用。\n提示：绿茶水温不宜过高，控制浸泡时间避免苦涩。', 0, 1, 2, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_scenario` (`id`, `scenario_type`, `title`, `summary`, `cover_image`, `detail_content`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (3, 'outdoor', '户外便携冲泡', '户外用保温杯冲泡白茶，方便携带。', NULL, '工具：保温杯。\n步骤：投茶→注热水→闷泡→饮用。\n提示：可提前准备热水，注意杯内清洁避免异味。', 0, 1, 3, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_scenario` (`id`, `scenario_type`, `title`, `summary`, `cover_image`, `detail_content`, `view_count`, `status`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (4, 'home', '居家冷泡茶', '冷泡绿茶/乌龙茶，口感清爽，适合夏天。', NULL, '工具：密封冷泡壶。\n步骤：投茶→注常温水→冷藏→过滤饮用。\n提示：冷藏 4-6 小时风味最佳。', 0, 1, 4, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
 COMMIT;
 
 -- ----------------------------
@@ -234,12 +231,11 @@ COMMIT;
 DROP TABLE IF EXISTS `tea_topic`;
 CREATE TABLE `tea_topic` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `topic_key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '业务标识（process-puer等）',
   `topic_code` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '逻辑关联 tea_topic_category.topic_code（无外键）',
   `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '标题',
   `summary` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '简述',
   `cover_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '封面图URL',
-  `detail_content` text COLLATE utf8mb4_unicode_ci COMMENT '详情HTML',
+  `detail_content` text COLLATE utf8mb4_unicode_ci COMMENT '详情内容',
   `audio_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '音频URL（养生类专题有音频）',
   `view_count` int NOT NULL DEFAULT '0' COMMENT '浏览量',
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态：1已发布 0草稿',
@@ -248,7 +244,6 @@ CREATE TABLE `tea_topic` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_topic_key` (`topic_key`),
   KEY `idx_topic_code` (`topic_code`),
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='进阶专题表';
@@ -321,26 +316,24 @@ COMMIT;
 DROP TABLE IF EXISTS `tea_ware`;
 CREATE TABLE `tea_ware` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `ware_key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '业务标识',
   `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '茶器名称',
   `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '图片URL',
-  `detail_content` text COLLATE utf8mb4_unicode_ci COMMENT '使用指南HTML',
+  `detail_content` text COLLATE utf8mb4_unicode_ci COMMENT '使用指南内容',
   `suitable_tea` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '适配茶类',
   `sort_order` int NOT NULL DEFAULT '0' COMMENT '排序',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_ware_key` (`ware_key`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='茶器表';
 
 -- ----------------------------
 -- Records of tea_ware
 -- ----------------------------
 BEGIN;
-INSERT INTO `tea_ware` (`id`, `ware_key`, `name`, `image`, `detail_content`, `suitable_tea`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (1, 'zisha', '紫砂壶', './images/2.1.jpg', NULL, '乌龙茶、普洱茶', 1, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
-INSERT INTO `tea_ware` (`id`, `ware_key`, `name`, `image`, `detail_content`, `suitable_tea`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (2, 'gaiwan', '白瓷盖碗', './images/2.jpg', NULL, '所有茶类，尤其绿茶、红茶', 2, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
-INSERT INTO `tea_ware` (`id`, `ware_key`, `name`, `image`, `detail_content`, `suitable_tea`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (3, 'glass-cup', '玻璃杯', './images/2.3.png', NULL, '绿茶、花茶、白茶', 3, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_ware` (`id`, `name`, `image`, `detail_content`, `suitable_tea`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (1, '紫砂壶', './images/2.1.jpg', NULL, '乌龙茶、普洱茶', 1, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_ware` (`id`, `name`, `image`, `detail_content`, `suitable_tea`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (2, '白瓷盖碗', './images/2.jpg', NULL, '所有茶类，尤其绿茶、红茶', 2, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
+INSERT INTO `tea_ware` (`id`, `name`, `image`, `detail_content`, `suitable_tea`, `sort_order`, `create_time`, `update_time`, `deleted`) VALUES (3, '玻璃杯', './images/2.3.png', NULL, '绿茶、花茶、白茶', 3, '2026-04-29 20:27:17', '2026-04-29 20:27:17', 0);
 COMMIT;
 
 -- ----------------------------
@@ -352,7 +345,6 @@ CREATE TABLE `user_favorite` (
   `user_id` bigint NOT NULL COMMENT '逻辑关联 sys_user.id（无外键）',
   `target_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '收藏类型：knowledge/topic/scenario/food',
   `target_id` bigint NOT NULL COMMENT '目标ID（对应业务表主键）',
-  `target_key` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '业务key（冗余便于查询）',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除',
   PRIMARY KEY (`id`),

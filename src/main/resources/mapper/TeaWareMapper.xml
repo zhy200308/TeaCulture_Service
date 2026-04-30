@@ -5,7 +5,6 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.tea.teaculture_service.entity.TeaWare">
         <id column="id" property="id" />
-        <result column="ware_key" property="wareKey" />
         <result column="name" property="name" />
         <result column="image" property="image" />
         <result column="detail_content" property="detailContent" />
@@ -18,7 +17,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, ware_key, name, image, detail_content, suitable_tea, sort_order, create_time, update_time, deleted
+        id, name, image, detail_content, suitable_tea, sort_order, create_time, update_time, deleted
     </sql>
 
 </mapper>

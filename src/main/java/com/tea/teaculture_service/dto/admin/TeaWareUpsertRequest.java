@@ -9,11 +9,9 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class TeaWareUpsertRequest {
 
-    private String wareKey;
     private String name;
     private String image;
     private String detailContent;
     private String suitableTea;
     private Integer sortOrder;
 }
-

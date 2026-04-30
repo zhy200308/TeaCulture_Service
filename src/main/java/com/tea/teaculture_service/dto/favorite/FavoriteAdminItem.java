@@ -24,8 +24,6 @@ public class FavoriteAdminItem {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long targetId;
 
-    private String targetKey;
     private String targetTitle;
     private LocalDateTime createTime;
 }
-

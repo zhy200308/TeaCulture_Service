@@ -44,6 +44,7 @@ async function load() {
         return;
     }
     const records = result.data?.records || [];
+    const typeMap = { home: '居家', office: '办公室', outdoor: '户外' };
     if (!records.length) {
         tbody.innerHTML = '<tr><td colspan="6" align="center">暂无数据</td></tr>';
     } else {
@@ -51,12 +52,12 @@ async function load() {
             <tr>
                 <td><input type="checkbox" name="rowId" value="${s.id}"></td>
                 <td>${s.id}</td>
-                <td>${s.scenarioType || ''}</td>
+                <td>${typeMap[s.scenarioType] || (s.scenarioType || '')}</td>
                 <td>${s.title || ''}</td>
                 <td>${s.status === true || s.status === 1 ? '<span class="tag">已发布</span>' : '<span class="tag" style="background:#fff1f1;color:#ff5252;">草稿</span>'}</td>
                 <td>
                     <div class="row-actions">
-                        <button class="btn light" onclick="openEditor('${s.id}','${s.scenarioKey}')">编辑</button>
+                        <button class="btn light" onclick="openEditor('${s.id}')">编辑</button>
                         <button class="btn danger" onclick="deleteRow('${s.id}')">删除</button>
                     </div>
                 </td>
@@ -78,25 +79,21 @@ function changePage(delta) {
     load();
 }
 
-window.openEditor = async function (id, scenarioKey) {
+window.openEditor = async function (id) {
     let data = { status: 1 };
-    if (scenarioKey) {
-        const r = await API.Scenario.getByKey(scenarioKey);
+    if (id) {
+        const r = await API.Scenario.getById(id);
         if (r.code === 200 && r.data) data = r.data.scenario || r.data;
     }
 
     AdminCommon.openModal(id ? '编辑场景教程' : '新增场景教程', `
         <div class="form-grid">
             <div class="form-item">
-                <label>内容标识（唯一）</label>
-                <input id="f_key" type="text" value="${escapeHtml(data.scenarioKey || '')}" ${id ? 'disabled' : ''}>
-            </div>
-            <div class="form-item">
                 <label>场景类型</label>
                 <select id="f_type">
-                    <option value="home">home</option>
-                    <option value="office">office</option>
-                    <option value="outdoor">outdoor</option>
+                    <option value="home">居家</option>
+                    <option value="office">办公室</option>
+                    <option value="outdoor">户外</option>
                 </select>
             </div>
             <div class="form-item">
@@ -107,7 +104,7 @@ window.openEditor = async function (id, scenarioKey) {
                 <label>封面图</label>
                 <input id="f_coverFile" type="file" accept="image/*">
                 <input id="f_cover" type="hidden" value="${escapeHtml(data.coverImage || '')}">
-                <img id="f_coverPreview" src="${escapeHtml(data.coverImage || '')}" style="margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
+                <img id="f_coverPreview" src="${escapeHtml(data.coverImage || '')}" style="display:${data.coverImage ? 'block' : 'none'};margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
             </div>
             <div class="form-item">
                 <label>状态</label>
@@ -141,7 +138,6 @@ window.openEditor = async function (id, scenarioKey) {
             coverImage = up.data;
         }
         const payload = {
-            scenarioKey: document.getElementById('f_key').value.trim(),
             scenarioType: document.getElementById('f_type').value,
             title: document.getElementById('f_title').value.trim(),
             coverImage,
@@ -150,8 +146,8 @@ window.openEditor = async function (id, scenarioKey) {
             status: parseInt(document.getElementById('f_status').value, 10),
             sortOrder: document.getElementById('f_sort').value === '' ? null : parseInt(document.getElementById('f_sort').value, 10)
         };
-        if (!id && !payload.scenarioKey) {
-            alert('内容标识不能为空');
+        if (!payload.title) {
+            alert('标题不能为空');
             return;
         }
         const r = id ? await API.Scenario.update(id, payload) : await API.Scenario.create(payload);
@@ -168,7 +164,10 @@ window.openEditor = async function (id, scenarioKey) {
     if (coverFile && coverPreview) {
         coverFile.addEventListener('change', () => {
             const file = coverFile.files && coverFile.files[0];
-            if (file) coverPreview.src = URL.createObjectURL(file);
+            if (file) {
+                coverPreview.src = URL.createObjectURL(file);
+                coverPreview.style.display = 'block';
+            }
         });
     }
 

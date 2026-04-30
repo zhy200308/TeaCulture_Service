@@ -38,11 +38,6 @@ public class TeaKnowledge extends Model<TeaKnowledge> {
     private Long id;
 
 
-    @Schema(description = "业务标识（如六大茶类）")
-    @TableField("knowledge_key")
-    private String knowledgeKey;
-
-
     @Schema(description = "逻辑关联 tea_category.category_code（无外键）")
     @TableField("category_code")
     private String categoryCode;
@@ -58,7 +53,7 @@ public class TeaKnowledge extends Model<TeaKnowledge> {
     private String summary;
 
 
-    @Schema(description = "详情HTML内容")
+    @Schema(description = "详情内容")
     @TableField("detail_content")
     private String detailContent;
 

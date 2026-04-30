@@ -75,7 +75,6 @@ public class KnowledgeController {
 
         List<KnowledgeListItem> items = page.getRecords().stream().map(k -> new KnowledgeListItem()
                 .setId(k.getId())
-                .setKnowledgeKey(k.getKnowledgeKey())
                 .setCategoryCode(k.getCategoryCode())
                 .setCategoryName(categoryMap.get(k.getCategoryCode()) == null ? null : categoryMap.get(k.getCategoryCode()).getCategoryName())
                 .setTitle(k.getTitle())
@@ -92,10 +91,10 @@ public class KnowledgeController {
         return ApiResponse.ok(resp);
     }
 
-    @GetMapping("/detail/{key}")
-    public ApiResponse<TeaKnowledge> detail(@PathVariable("key") String key) {
+    @GetMapping("/detail/{id}")
+    public ApiResponse<TeaKnowledge> detail(@PathVariable("id") Long id) {
         TeaKnowledge k = teaKnowledgeService.getOne(new LambdaQueryWrapper<TeaKnowledge>()
-                .eq(TeaKnowledge::getKnowledgeKey, key)
+                .eq(TeaKnowledge::getId, id)
                 .eq(TeaKnowledge::getDeleted, false)
                 .last("limit 1"));
         if (k == null) {
@@ -116,10 +115,10 @@ public class KnowledgeController {
         return ApiResponse.ok(list);
     }
 
-    @GetMapping("/wares/{key}")
-    public ApiResponse<TeaWare> wareDetail(@PathVariable("key") String key) {
+    @GetMapping("/wares/{id}")
+    public ApiResponse<TeaWare> wareDetail(@PathVariable("id") Long id) {
         TeaWare ware = teaWareService.getOne(new LambdaQueryWrapper<TeaWare>()
-                .eq(TeaWare::getWareKey, key)
+                .eq(TeaWare::getId, id)
                 .eq(TeaWare::getDeleted, false)
                 .last("limit 1"));
         if (ware == null) {
@@ -133,11 +132,10 @@ public class KnowledgeController {
         if (!UserContext.isAdmin()) {
             return ApiResponse.forbidden("无权限");
         }
-        if (req == null || req.getKnowledgeKey() == null || req.getKnowledgeKey().isBlank()) {
-            return ApiResponse.badRequest("knowledgeKey不能为空");
+        if (req == null || req.getTitle() == null || req.getTitle().isBlank()) {
+            return ApiResponse.badRequest("标题不能为空");
         }
         TeaKnowledge entity = new TeaKnowledge()
-                .setKnowledgeKey(req.getKnowledgeKey())
                 .setCategoryCode(req.getCategoryCode())
                 .setTitle(req.getTitle())
                 .setSummary(req.getSummary())
@@ -159,7 +157,6 @@ public class KnowledgeController {
             return ApiResponse.fail("内容不存在");
         }
         TeaKnowledge upd = new TeaKnowledge().setId(id);
-        if (req.getKnowledgeKey() != null) upd.setKnowledgeKey(req.getKnowledgeKey());
         if (req.getCategoryCode() != null) upd.setCategoryCode(req.getCategoryCode());
         if (req.getTitle() != null) upd.setTitle(req.getTitle());
         if (req.getSummary() != null) upd.setSummary(req.getSummary());

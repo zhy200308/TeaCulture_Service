@@ -65,7 +65,6 @@ public class AdminFavoriteController {
     public ApiResponse<PageResponse<FavoriteAdminItem>> list(@RequestParam(required = false) Long userId,
                                                              @RequestParam(required = false) String username,
                                                              @RequestParam(required = false) String targetType,
-                                                             @RequestParam(required = false) String targetKey,
                                                              @RequestParam(defaultValue = "1") Long pageNum,
                                                              @RequestParam(defaultValue = "20") Long pageSize) {
         if (!UserContext.isAdmin()) {
@@ -93,7 +92,6 @@ public class AdminFavoriteController {
                         .eq(userId != null, UserFavorite::getUserId, userId)
                         .in(userIds != null, UserFavorite::getUserId, userIds)
                         .eq(targetType != null && !targetType.isBlank(), UserFavorite::getTargetType, targetType)
-                        .like(targetKey != null && !targetKey.isBlank(), UserFavorite::getTargetKey, targetKey)
                         .orderByDesc(UserFavorite::getCreateTime));
 
         List<Long> pageUserIds = page.getRecords().stream().map(UserFavorite::getUserId).filter(Objects::nonNull).distinct().toList();
@@ -108,7 +106,6 @@ public class AdminFavoriteController {
                 .setUsername(userMap.get(f.getUserId()) == null ? null : userMap.get(f.getUserId()).getUsername())
                 .setTargetType(f.getTargetType())
                 .setTargetId(f.getTargetId())
-                .setTargetKey(f.getTargetKey())
                 .setTargetTitle(titleMap.getOrDefault(f.getTargetType(), Collections.emptyMap()).get(f.getTargetId()))
                 .setCreateTime(f.getCreateTime())).toList();
 
@@ -169,4 +166,3 @@ public class AdminFavoriteController {
         return map;
     }
 }
-

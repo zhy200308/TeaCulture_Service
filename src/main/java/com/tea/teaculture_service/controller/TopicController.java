@@ -71,7 +71,6 @@ public class TopicController {
 
         List<TopicListItem> items = page.getRecords().stream().map(t -> new TopicListItem()
                 .setId(t.getId())
-                .setTopicKey(t.getTopicKey())
                 .setTopicCode(t.getTopicCode())
                 .setTopicName(categoryMap.get(t.getTopicCode()) == null ? null : categoryMap.get(t.getTopicCode()).getTopicName())
                 .setTitle(t.getTitle())
@@ -89,10 +88,10 @@ public class TopicController {
         return ApiResponse.ok(resp);
     }
 
-    @GetMapping("/detail/{key}")
-    public ApiResponse<TeaTopic> detail(@PathVariable("key") String key) {
+    @GetMapping("/detail/{id}")
+    public ApiResponse<TeaTopic> detail(@PathVariable("id") Long id) {
         TeaTopic topic = teaTopicService.getOne(new LambdaQueryWrapper<TeaTopic>()
-                .eq(TeaTopic::getTopicKey, key)
+                .eq(TeaTopic::getId, id)
                 .eq(TeaTopic::getDeleted, false)
                 .last("limit 1"));
         if (topic == null) {
@@ -109,11 +108,10 @@ public class TopicController {
         if (!UserContext.isAdmin()) {
             return ApiResponse.forbidden("无权限");
         }
-        if (req == null || req.getTopicKey() == null || req.getTopicKey().isBlank()) {
-            return ApiResponse.badRequest("topicKey不能为空");
+        if (req == null || req.getTitle() == null || req.getTitle().isBlank()) {
+            return ApiResponse.badRequest("标题不能为空");
         }
         TeaTopic entity = new TeaTopic()
-                .setTopicKey(req.getTopicKey())
                 .setTopicCode(req.getTopicCode())
                 .setTitle(req.getTitle())
                 .setSummary(req.getSummary())
@@ -136,7 +134,6 @@ public class TopicController {
             return ApiResponse.fail("内容不存在");
         }
         TeaTopic upd = new TeaTopic().setId(id);
-        if (req.getTopicKey() != null) upd.setTopicKey(req.getTopicKey());
         if (req.getTopicCode() != null) upd.setTopicCode(req.getTopicCode());
         if (req.getTitle() != null) upd.setTitle(req.getTitle());
         if (req.getSummary() != null) upd.setSummary(req.getSummary());

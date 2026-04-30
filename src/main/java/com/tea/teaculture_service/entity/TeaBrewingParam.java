@@ -38,9 +38,9 @@ public class TeaBrewingParam extends Model<TeaBrewingParam> {
     private Long id;
 
 
-    @Schema(description = "逻辑关联 tea_scenario.scenario_key（无外键）")
-    @TableField("scenario_key")
-    private String scenarioKey;
+    @Schema(description = "逻辑关联 tea_scenario.id（无外键）")
+    @TableField("scenario_id")
+    private Long scenarioId;
 
 
     @Schema(description = "茶类（乌龙茶等）")

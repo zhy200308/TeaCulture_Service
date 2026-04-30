@@ -38,11 +38,6 @@ public class TeaScenario extends Model<TeaScenario> {
     private Long id;
 
 
-    @Schema(description = "业务标识（home-kungfu等）")
-    @TableField("scenario_key")
-    private String scenarioKey;
-
-
     @Schema(description = "场景类型：home/office/outdoor")
     @TableField("scenario_type")
     private String scenarioType;
@@ -63,7 +58,7 @@ public class TeaScenario extends Model<TeaScenario> {
     private String coverImage;
 
 
-    @Schema(description = "详情HTML（含工具/步骤/小贴士）")
+    @Schema(description = "详情内容（含工具/步骤/小贴士）")
     @TableField("detail_content")
     private String detailContent;
 

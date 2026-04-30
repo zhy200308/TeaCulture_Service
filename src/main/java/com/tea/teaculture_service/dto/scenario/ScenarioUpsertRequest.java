@@ -9,7 +9,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ScenarioUpsertRequest {
 
-    private String scenarioKey;
     private String scenarioType;
     private String title;
     private String summary;
@@ -17,4 +16,3 @@ public class ScenarioUpsertRequest {
     private String coverImage;
     private Integer status;
 }
-

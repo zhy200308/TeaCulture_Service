@@ -8,14 +8,13 @@
         <result column="user_id" property="userId" />
         <result column="target_type" property="targetType" />
         <result column="target_id" property="targetId" />
-        <result column="target_key" property="targetKey" />
         <result column="create_time" property="createTime" />
         <result column="deleted" property="deleted" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, user_id, target_type, target_id, target_key, create_time, deleted
+        id, user_id, target_type, target_id, create_time, deleted
     </sql>
 
 </mapper>

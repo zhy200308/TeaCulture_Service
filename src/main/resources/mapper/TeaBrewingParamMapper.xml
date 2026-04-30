@@ -5,7 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.tea.teaculture_service.entity.TeaBrewingParam">
         <id column="id" property="id" />
-        <result column="scenario_key" property="scenarioKey" />
+        <result column="scenario_id" property="scenarioId" />
         <result column="tea_type" property="teaType" />
         <result column="amount" property="amount" />
         <result column="water_temp" property="waterTemp" />
@@ -18,7 +18,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, scenario_key, tea_type, amount, water_temp, brew_time, note, create_time, update_time, deleted
+        id, scenario_id, tea_type, amount, water_temp, brew_time, note, create_time, update_time, deleted
     </sql>
 
 </mapper>

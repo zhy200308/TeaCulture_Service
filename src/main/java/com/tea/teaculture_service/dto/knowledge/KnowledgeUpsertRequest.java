@@ -9,7 +9,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class KnowledgeUpsertRequest {
 
-    private String knowledgeKey;
     private String categoryCode;
     private String title;
     private String summary;
@@ -17,4 +16,3 @@ public class KnowledgeUpsertRequest {
     private String coverImage;
     private Integer status;
 }
-

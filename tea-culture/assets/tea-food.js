@@ -2,14 +2,13 @@
  * tea-food.js - 茶食搭配
  * 对接接口：
  *   - GET /api/tea-food/list                       查询搭配列表
- *   - GET /api/tea-food/detail/{key}               查询搭配详情（含设备参数）
+ *   - GET /api/tea-food/detail/{id}                查询搭配详情（含设备参数）
  *   - GET /api/tea-food/tea-params/{teaTypeCode}   查询茶类设备参数
  *   - POST /api/device/command                     上报设备指令日志
  *   - POST /api/favorite                           收藏
  */
 
 let currentTeaType = 'all';
-let currentMatchKey = null;
 let currentTeaParam = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -70,21 +69,20 @@ async function loadMatchList() {
                 <span class="tea-tag">${teaNameMap[item.teaTypeCode] || item.teaName || ''}</span>
                 <h3>${item.title}</h3>
                 <p class="match-desc">${item.summary || ''}</p>
-                <div class="detail-btn" onclick="openMatchModal('${item.matchKey}', ${item.id})">查看详情</div>
+                <div class="detail-btn" onclick="openMatchModal(${item.id})">查看详情</div>
             </div>
         </div>
     `).join('');
 }
 
 // ===== 显示搭配详情 =====
-async function openMatchModal(matchKey, id) {
+async function openMatchModal(id) {
     const modal = document.getElementById('detailModal');
     const modalContent = document.getElementById('modalContent');
     modalContent.innerHTML = '<p style="text-align:center;padding:40px;">加载中...</p>';
     modal.classList.add('active');
-    currentMatchKey = matchKey;
 
-    const result = await API.TeaFood.getByKey(matchKey);
+    const result = await API.TeaFood.getById(id);
     if (result.code !== 200 || !result.data) {
         modalContent.innerHTML = '<h3>内容加载失败</h3>';
         return;
@@ -114,7 +112,7 @@ async function openMatchModal(matchKey, id) {
     modalContent.innerHTML = html;
 
     bindSyncButton();
-    appendFavoriteBtn(modalContent, 'food', id, matchKey);
+    appendFavoriteBtn(modalContent, 'food', id);
 }
 
 function renderTextDetail(text) {
@@ -191,7 +189,7 @@ function updateDeviceStatusUI(connected) {
     }
 }
 
-function appendFavoriteBtn(container, targetType, targetId, targetKey) {
+function appendFavoriteBtn(container, targetType, targetId) {
     const btn = document.createElement('button');
     btn.style.cssText = 'margin-top:15px;padding:8px 18px;border:1px solid #ddd;border-radius:6px;cursor:pointer;background:#fff;color:#8b5a2b;';
     let isFavorite = false;
@@ -233,7 +231,7 @@ function appendFavoriteBtn(container, targetType, targetId, targetKey) {
                 alert(r.message || '取消收藏失败');
             }
         } else {
-            const r = await API.Favorite.add(targetType, targetId, targetKey);
+            const r = await API.Favorite.add(targetType, targetId);
             if (r.code === 200) {
                 isFavorite = true;
                 render();

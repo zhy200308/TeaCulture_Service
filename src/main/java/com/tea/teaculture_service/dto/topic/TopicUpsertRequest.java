@@ -9,7 +9,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class TopicUpsertRequest {
 
-    private String topicKey;
     private String topicCode;
     private String title;
     private String summary;
@@ -18,4 +17,3 @@ public class TopicUpsertRequest {
     private String audioUrl;
     private Integer status;
 }
-

@@ -38,11 +38,6 @@ public class TeaTopic extends Model<TeaTopic> {
     private Long id;
 
 
-    @Schema(description = "业务标识（process-puer等）")
-    @TableField("topic_key")
-    private String topicKey;
-
-
     @Schema(description = "逻辑关联 tea_topic_category.topic_code（无外键）")
     @TableField("topic_code")
     private String topicCode;
@@ -63,7 +58,7 @@ public class TeaTopic extends Model<TeaTopic> {
     private String coverImage;
 
 
-    @Schema(description = "详情HTML")
+    @Schema(description = "详情内容")
     @TableField("detail_content")
     private String detailContent;
 

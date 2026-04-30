@@ -54,17 +54,17 @@ public class ScenarioController {
         return ApiResponse.ok(resp);
     }
 
-    @GetMapping("/detail/{key}")
-    public ApiResponse<ScenarioDetailResponse> detail(@PathVariable("key") String key) {
+    @GetMapping("/detail/{id}")
+    public ApiResponse<ScenarioDetailResponse> detail(@PathVariable("id") Long id) {
         TeaScenario scenario = teaScenarioService.getOne(new LambdaQueryWrapper<TeaScenario>()
-                .eq(TeaScenario::getScenarioKey, key)
+                .eq(TeaScenario::getId, id)
                 .eq(TeaScenario::getDeleted, false)
                 .last("limit 1"));
         if (scenario == null) {
             return ApiResponse.fail("内容不存在");
         }
         TeaBrewingParam param = teaBrewingParamService.getOne(new LambdaQueryWrapper<TeaBrewingParam>()
-                .eq(TeaBrewingParam::getScenarioKey, key)
+                .eq(TeaBrewingParam::getScenarioId, scenario.getId())
                 .eq(TeaBrewingParam::getDeleted, false)
                 .last("limit 1"));
 
@@ -75,10 +75,10 @@ public class ScenarioController {
         return ApiResponse.ok(new ScenarioDetailResponse().setScenario(scenario).setBrewingParam(param));
     }
 
-    @GetMapping("/params/{scenarioKey}")
-    public ApiResponse<TeaBrewingParam> params(@PathVariable("scenarioKey") String scenarioKey) {
+    @GetMapping("/params/{scenarioId}")
+    public ApiResponse<TeaBrewingParam> params(@PathVariable("scenarioId") Long scenarioId) {
         TeaBrewingParam param = teaBrewingParamService.getOne(new LambdaQueryWrapper<TeaBrewingParam>()
-                .eq(TeaBrewingParam::getScenarioKey, scenarioKey)
+                .eq(TeaBrewingParam::getScenarioId, scenarioId)
                 .eq(TeaBrewingParam::getDeleted, false)
                 .last("limit 1"));
         return ApiResponse.ok(param);
@@ -89,11 +89,10 @@ public class ScenarioController {
         if (!UserContext.isAdmin()) {
             return ApiResponse.forbidden("无权限");
         }
-        if (req == null || req.getScenarioKey() == null || req.getScenarioKey().isBlank()) {
-            return ApiResponse.badRequest("scenarioKey不能为空");
+        if (req == null || req.getTitle() == null || req.getTitle().isBlank()) {
+            return ApiResponse.badRequest("标题不能为空");
         }
         TeaScenario entity = new TeaScenario()
-                .setScenarioKey(req.getScenarioKey())
                 .setScenarioType(req.getScenarioType())
                 .setTitle(req.getTitle())
                 .setSummary(req.getSummary())
@@ -115,7 +114,6 @@ public class ScenarioController {
             return ApiResponse.fail("内容不存在");
         }
         TeaScenario upd = new TeaScenario().setId(id);
-        if (req.getScenarioKey() != null) upd.setScenarioKey(req.getScenarioKey());
         if (req.getScenarioType() != null) upd.setScenarioType(req.getScenarioType());
         if (req.getTitle() != null) upd.setTitle(req.getTitle());
         if (req.getSummary() != null) upd.setSummary(req.getSummary());

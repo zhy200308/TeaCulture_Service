@@ -5,7 +5,6 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.tea.teaculture_service.entity.TeaFoodMatch">
         <id column="id" property="id" />
-        <result column="match_key" property="matchKey" />
         <result column="tea_type_code" property="teaTypeCode" />
         <result column="tea_name" property="teaName" />
         <result column="food_name" property="foodName" />
@@ -22,7 +21,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, match_key, tea_type_code, tea_name, food_name, title, summary, cover_image, detail_content, status, sort_order, create_time, update_time, deleted
+        id, tea_type_code, tea_name, food_name, title, summary, cover_image, detail_content, status, sort_order, create_time, update_time, deleted
     </sql>
 
 </mapper>

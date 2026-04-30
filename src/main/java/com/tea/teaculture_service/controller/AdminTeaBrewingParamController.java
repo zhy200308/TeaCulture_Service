@@ -30,7 +30,7 @@ public class AdminTeaBrewingParamController {
     }
 
     @GetMapping
-    public ApiResponse<PageResponse<TeaBrewingParam>> list(@RequestParam(required = false) String scenarioKey,
+    public ApiResponse<PageResponse<TeaBrewingParam>> list(@RequestParam(required = false) Long scenarioId,
                                                            @RequestParam(required = false) String keyword,
                                                            @RequestParam(defaultValue = "1") Long pageNum,
                                                            @RequestParam(defaultValue = "20") Long pageSize) {
@@ -40,10 +40,9 @@ public class AdminTeaBrewingParamController {
         Page<TeaBrewingParam> page = teaBrewingParamService.page(new Page<>(pageNum, pageSize),
                 new LambdaQueryWrapper<TeaBrewingParam>()
                         .eq(TeaBrewingParam::getDeleted, false)
-                        .eq(scenarioKey != null && !scenarioKey.isBlank(), TeaBrewingParam::getScenarioKey, scenarioKey)
+                        .eq(scenarioId != null, TeaBrewingParam::getScenarioId, scenarioId)
                         .and(keyword != null && !keyword.isBlank(),
-                                w -> w.like(TeaBrewingParam::getScenarioKey, keyword)
-                                        .or().like(TeaBrewingParam::getTeaType, keyword)
+                                w -> w.like(TeaBrewingParam::getTeaType, keyword)
                                         .or().like(TeaBrewingParam::getNote, keyword))
                         .orderByDesc(TeaBrewingParam::getUpdateTime));
         PageResponse<TeaBrewingParam> resp = new PageResponse<TeaBrewingParam>()
@@ -59,11 +58,11 @@ public class AdminTeaBrewingParamController {
         if (!UserContext.isAdmin()) {
             return ApiResponse.forbidden("无权限");
         }
-        if (req == null || req.getScenarioKey() == null || req.getScenarioKey().isBlank()) {
-            return ApiResponse.badRequest("scenarioKey不能为空");
+        if (req == null || req.getScenarioId() == null) {
+            return ApiResponse.badRequest("scenarioId不能为空");
         }
         TeaBrewingParam entity = new TeaBrewingParam()
-                .setScenarioKey(req.getScenarioKey())
+                .setScenarioId(req.getScenarioId())
                 .setTeaType(req.getTeaType())
                 .setAmount(req.getAmount())
                 .setWaterTemp(req.getWaterTemp())
@@ -84,7 +83,7 @@ public class AdminTeaBrewingParamController {
             return ApiResponse.fail("内容不存在");
         }
         TeaBrewingParam upd = new TeaBrewingParam().setId(id);
-        if (req.getScenarioKey() != null) upd.setScenarioKey(req.getScenarioKey());
+        if (req.getScenarioId() != null) upd.setScenarioId(req.getScenarioId());
         if (req.getTeaType() != null) upd.setTeaType(req.getTeaType());
         if (req.getAmount() != null) upd.setAmount(req.getAmount());
         if (req.getWaterTemp() != null) upd.setWaterTemp(req.getWaterTemp());
@@ -115,4 +114,3 @@ public class AdminTeaBrewingParamController {
         return ApiResponse.ok();
     }
 }
-

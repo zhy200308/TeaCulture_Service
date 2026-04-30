@@ -2,14 +2,13 @@
  * scenario.js - 场景化教程
  * 对接接口：
  *   - GET /api/scenario/list                       查询教程列表
- *   - GET /api/scenario/detail/{key}               查询教程详情（含冲泡参数）
- *   - GET /api/scenario/params/{scenarioKey}       查询冲泡参数
+ *   - GET /api/scenario/detail/{id}                查询教程详情（含冲泡参数）
+ *   - GET /api/scenario/params/{scenarioId}        查询冲泡参数
  *   - POST /api/device/command                     上报设备指令日志
  *   - POST /api/favorite                           收藏
  */
 
 let currentScenarioType = 'all';
-let currentScenarioKey = null;
 let currentParams = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -73,21 +72,20 @@ async function loadScenarioList() {
                 <span class="scenario-tag">${typeNameMap[item.scenarioType] || ''}</span>
                 <h3>${item.title}</h3>
                 <p class="scenario-desc">${item.summary || ''}</p>
-                <div class="view-btn" onclick="openScenarioModal('${item.scenarioKey}', ${item.id})">查看教程</div>
+            <div class="view-btn" onclick="openScenarioModal(${item.id})">查看教程</div>
             </div>
         </div>
     `).join('');
 }
 
 // ===== 显示教程详情 =====
-async function openScenarioModal(scenarioKey, id) {
+async function openScenarioModal(id) {
     const modal = document.getElementById('detailModal');
     const modalContent = document.getElementById('modalContent');
     modalContent.innerHTML = '<p style="text-align:center;padding:40px;">加载中...</p>';
     modal.classList.add('active');
-    currentScenarioKey = scenarioKey;
 
-    const result = await API.Scenario.getByKey(scenarioKey);
+    const result = await API.Scenario.getById(id);
     if (result.code !== 200 || !result.data) {
         modalContent.innerHTML = '<h3>内容加载失败</h3>';
         return;
@@ -118,7 +116,7 @@ async function openScenarioModal(scenarioKey, id) {
     modalContent.innerHTML = html;
 
     bindSyncButton();
-    appendFavoriteBtn(modalContent, 'scenario', id, scenarioKey);
+    appendFavoriteBtn(modalContent, 'scenario', id);
 }
 
 function renderTextDetail(text) {
@@ -209,7 +207,7 @@ function updateDeviceStatusUI(connected) {
     }
 }
 
-function appendFavoriteBtn(container, targetType, targetId, targetKey) {
+function appendFavoriteBtn(container, targetType, targetId) {
     const btn = document.createElement('button');
     btn.style.cssText = 'margin-top:15px;padding:8px 18px;border:1px solid #ddd;border-radius:6px;cursor:pointer;background:#fff;color:#8b5a2b;';
     let isFavorite = false;
@@ -251,7 +249,7 @@ function appendFavoriteBtn(container, targetType, targetId, targetKey) {
                 alert(r.message || '取消收藏失败');
             }
         } else {
-            const r = await API.Favorite.add(targetType, targetId, targetKey);
+            const r = await API.Favorite.add(targetType, targetId);
             if (r.code === 200) {
                 isFavorite = true;
                 render();

@@ -169,11 +169,11 @@ const KnowledgeAPI = {
     },
 
     /**
-     * 根据 key 获取基础茶识详情
-     * GET /api/knowledge/detail/{key}
+     * 根据 id 获取基础茶识详情
+     * GET /api/knowledge/detail/{id}
      */
-    getByKey(key) {
-        return http.get(`/knowledge/detail/${key}`);
+    getById(id) {
+        return http.get(`/knowledge/detail/${id}`);
     },
 
     /**
@@ -185,17 +185,17 @@ const KnowledgeAPI = {
     },
 
     /**
-     * 根据 key 获取茶器详情
-     * GET /api/knowledge/wares/{key}
+     * 根据 id 获取茶器详情
+     * GET /api/knowledge/wares/{id}
      */
-    getWareByKey(key) {
-        return http.get(`/knowledge/wares/${key}`);
+    getWareById(id) {
+        return http.get(`/knowledge/wares/${id}`);
     },
 
     /**
      * 新增茶识（管理员）
      * POST /api/knowledge
-     * 入参：{ knowledgeKey, categoryCode, title, summary, detailContent, coverImage, status }
+     * 入参：{ categoryCode, title, summary, detailContent, coverImage, status }
      */
     create(data) {
         return http.post('/knowledge', data);
@@ -242,11 +242,11 @@ const TopicAPI = {
     },
 
     /**
-     * 根据 key 获取专题详情
-     * GET /api/topic/detail/{key}
+     * 根据 id 获取专题详情
+     * GET /api/topic/detail/{id}
      */
-    getByKey(key) {
-        return http.get(`/topic/detail/${key}`);
+    getById(id) {
+        return http.get(`/topic/detail/${id}`);
     },
 
     /**
@@ -290,20 +290,20 @@ const ScenarioAPI = {
     },
 
     /**
-     * 根据 key 获取场景教程详情（包含冲泡参数）
-     * GET /api/scenario/detail/{key}
+     * 根据 id 获取场景教程详情（包含冲泡参数）
+     * GET /api/scenario/detail/{id}
      * 返回：{ scenario: {...}, brewingParam: {...} }
      */
-    getByKey(key) {
-        return http.get(`/scenario/detail/${key}`);
+    getById(id) {
+        return http.get(`/scenario/detail/${id}`);
     },
 
     /**
      * 查询场景对应的冲泡参数
-     * GET /api/scenario/params/{scenarioKey}
+     * GET /api/scenario/params/{scenarioId}
      */
-    getBrewingParam(scenarioKey) {
-        return http.get(`/scenario/params/${scenarioKey}`);
+    getBrewingParam(scenarioId) {
+        return http.get(`/scenario/params/${scenarioId}`);
     },
 
     /**
@@ -347,12 +347,12 @@ const TeaFoodAPI = {
     },
 
     /**
-     * 根据 key 获取茶食搭配详情（包含设备参数）
-     * GET /api/tea-food/detail/{key}
+     * 根据 id 获取茶食搭配详情（包含设备参数）
+     * GET /api/tea-food/detail/{id}
      * 返回：{ match: {...}, teaTypeParam: {...} }
      */
-    getByKey(key) {
-        return http.get(`/tea-food/detail/${key}`);
+    getById(id) {
+        return http.get(`/tea-food/detail/${id}`);
     },
 
     /**
@@ -435,10 +435,10 @@ const FavoriteAPI = {
     /**
      * 添加收藏
      * POST /api/favorite
-     * 入参：{ targetType, targetId, targetKey }
+     * 入参：{ targetType, targetId }
      */
-    add(targetType, targetId, targetKey) {
-        return http.post('/favorite', { targetType, targetId, targetKey });
+    add(targetType, targetId) {
+        return http.post('/favorite', { targetType, targetId });
     },
 
     /**

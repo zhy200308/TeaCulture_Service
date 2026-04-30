@@ -12,7 +12,6 @@ public class TopicListItem {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id;
-    private String topicKey;
     private String topicCode;
     private String topicName;
     private String title;
@@ -22,4 +21,3 @@ public class TopicListItem {
     private Integer viewCount;
     private Integer status;
 }
-

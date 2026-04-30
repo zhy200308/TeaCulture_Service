@@ -77,7 +77,6 @@ public class FavoriteController {
                 .setId(f.getId())
                 .setTargetType(f.getTargetType())
                 .setTargetId(f.getTargetId())
-                .setTargetKey(f.getTargetKey())
                 .setTargetTitle(titleMap.getOrDefault(f.getTargetType(), Collections.emptyMap()).get(f.getTargetId())))
                 .toList();
 
@@ -110,7 +109,6 @@ public class FavoriteController {
                 .setUserId(userId)
                 .setTargetType(req.getTargetType())
                 .setTargetId(req.getTargetId())
-                .setTargetKey(req.getTargetKey())
                 .setDeleted(false);
         userFavoriteService.save(fav);
         return ApiResponse.ok();
@@ -171,4 +169,3 @@ public class FavoriteController {
         return map;
     }
 }
-

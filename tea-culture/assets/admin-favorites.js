@@ -12,15 +12,14 @@ function bindEvents() {
             pageNum: 1,
             userId: document.getElementById('userId').value.trim(),
             username: document.getElementById('username').value.trim(),
-            targetType: document.getElementById('targetType').value,
-            targetKey: document.getElementById('targetKey').value.trim()
+            targetType: document.getElementById('targetType').value
         });
         load();
     });
     document.getElementById('resetBtn').addEventListener('click', () => {
-        ['userId', 'username', 'targetKey'].forEach(id => document.getElementById(id).value = '');
+        ['userId', 'username'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('targetType').value = '';
-        AdminCommon.setQuery({ pageNum: 1, userId: '', username: '', targetType: '', targetKey: '' });
+        AdminCommon.setQuery({ pageNum: 1, userId: '', username: '', targetType: '' });
         load();
     });
     document.getElementById('prevBtn').addEventListener('click', () => changePage(-1));
@@ -36,7 +35,6 @@ function hydrateFiltersFromQuery() {
     document.getElementById('userId').value = sp.get('userId') || '';
     document.getElementById('username').value = sp.get('username') || '';
     document.getElementById('targetType').value = sp.get('targetType') || '';
-    document.getElementById('targetKey').value = sp.get('targetKey') || '';
 }
 
 async function load() {
@@ -44,13 +42,11 @@ async function load() {
     const userId = document.getElementById('userId').value.trim();
     const username = document.getElementById('username').value.trim();
     const targetType = document.getElementById('targetType').value;
-    const targetKey = document.getElementById('targetKey').value.trim();
 
     const params = { pageNum, pageSize: 20 };
     if (userId) params.userId = userId;
     if (username) params.username = username;
     if (targetType) params.targetType = targetType;
-    if (targetKey) params.targetKey = targetKey;
 
     const result = await API.AdminFavorite.list(params);
     const tbody = document.getElementById('tbody');
@@ -59,6 +55,7 @@ async function load() {
         return;
     }
     const records = result.data?.records || [];
+    const typeMap = { knowledge: '茶识', topic: '专题', scenario: '场景教程', food: '茶食搭配' };
     if (!records.length) {
         tbody.innerHTML = '<tr><td colspan="7" align="center">暂无数据</td></tr>';
     } else {
@@ -67,9 +64,9 @@ async function load() {
                 <td><input type="checkbox" name="rowId" value="${f.id}"></td>
                 <td>${f.id}</td>
                 <td>${f.username || f.userId || ''}</td>
-                <td>${f.targetType || ''}</td>
+                <td>${typeMap[f.targetType] || f.targetType || ''}</td>
                 <td>${f.targetId || ''}</td>
-                <td>${escapeHtml(f.targetTitle || f.targetKey || '')}</td>
+                <td>${escapeHtml(f.targetTitle || '')}</td>
                 <td>
                     <div class="row-actions">
                         <button class="btn danger" onclick="deleteRow('${f.id}')">删除</button>

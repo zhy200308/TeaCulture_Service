@@ -53,11 +53,6 @@ public class UserFavorite extends Model<UserFavorite> {
     private Long targetId;
 
 
-    @Schema(description = "业务key（冗余便于查询）")
-    @TableField("target_key")
-    private String targetKey;
-
-
     @Schema(description = "创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;

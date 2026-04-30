@@ -9,7 +9,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class TeaFoodUpsertRequest {
 
-    private String matchKey;
     private String teaTypeCode;
     private String teaName;
     private String foodName;
@@ -20,4 +19,3 @@ public class TeaFoodUpsertRequest {
     private Integer status;
     private Integer sortOrder;
 }
-

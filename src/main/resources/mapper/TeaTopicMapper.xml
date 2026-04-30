@@ -5,7 +5,6 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.tea.teaculture_service.entity.TeaTopic">
         <id column="id" property="id" />
-        <result column="topic_key" property="topicKey" />
         <result column="topic_code" property="topicCode" />
         <result column="title" property="title" />
         <result column="summary" property="summary" />
@@ -22,7 +21,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, topic_key, topic_code, title, summary, cover_image, detail_content, audio_url, view_count, status, sort_order, create_time, update_time, deleted
+        id, topic_code, title, summary, cover_image, detail_content, audio_url, view_count, status, sort_order, create_time, update_time, deleted
     </sql>
 
 </mapper>

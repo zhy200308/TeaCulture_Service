@@ -38,11 +38,6 @@ public class TeaFoodMatch extends Model<TeaFoodMatch> {
     private Long id;
 
 
-    @Schema(description = "业务标识（green-bean等）")
-    @TableField("match_key")
-    private String matchKey;
-
-
     @Schema(description = "逻辑关联 tea_type_param.tea_type_code（无外键）")
     @TableField("tea_type_code")
     private String teaTypeCode;
@@ -73,7 +68,7 @@ public class TeaFoodMatch extends Model<TeaFoodMatch> {
     private String coverImage;
 
 
-    @Schema(description = "详情HTML（含搭配理由/食用建议/小贴士）")
+    @Schema(description = "详情内容（含搭配理由/食用建议/小贴士）")
     @TableField("detail_content")
     private String detailContent;
 

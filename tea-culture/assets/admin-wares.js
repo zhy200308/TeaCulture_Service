@@ -37,19 +37,18 @@ async function load() {
 
     const tbody = document.getElementById('tbody');
     if (result.code !== 200) {
-        tbody.innerHTML = '<tr><td colspan="6" align="center">加载失败</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" align="center">加载失败</td></tr>';
         return;
     }
     const records = result.data?.records || [];
     window.__wareMap = new Map(records.map(r => [String(r.id), r]));
     if (!records.length) {
-        tbody.innerHTML = '<tr><td colspan="6" align="center">暂无数据</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" align="center">暂无数据</td></tr>';
     } else {
         tbody.innerHTML = records.map(w => `
             <tr>
                 <td><input type="checkbox" name="rowId" value="${w.id}"></td>
                 <td>${w.id}</td>
-                <td>${escapeHtml(w.wareKey || '')}</td>
                 <td>${escapeHtml(w.name || '')}</td>
                 <td>${escapeHtml(w.suitableTea || '')}</td>
                 <td>
@@ -81,10 +80,6 @@ window.openEditor = function (id) {
     AdminCommon.openModal(id ? '编辑茶器' : '新增茶器', `
         <div class="form-grid">
             <div class="form-item">
-                <label>茶器标识（唯一）</label>
-                <input id="f_key" type="text" value="${escapeHtml(data.wareKey || '')}">
-            </div>
-            <div class="form-item">
                 <label>茶器名称</label>
                 <input id="f_name" type="text" value="${escapeHtml(data.name || '')}">
             </div>
@@ -92,7 +87,7 @@ window.openEditor = function (id) {
                 <label>图片</label>
                 <input id="f_imageFile" type="file" accept="image/*">
                 <input id="f_image" type="hidden" value="${escapeHtml(data.image || '')}">
-                <img id="f_imagePreview" src="${escapeHtml(data.image || '')}" style="margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
+                <img id="f_imagePreview" src="${escapeHtml(data.image || '')}" style="display:${data.image ? 'block' : 'none'};margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
             </div>
             <div class="form-item">
                 <label>适用茶类</label>
@@ -119,15 +114,14 @@ window.openEditor = function (id) {
             image = up.data;
         }
         const payload = {
-            wareKey: document.getElementById('f_key').value.trim(),
             name: document.getElementById('f_name').value.trim(),
             image,
             suitableTea: document.getElementById('f_suitable').value.trim(),
             sortOrder: document.getElementById('f_sort').value === '' ? null : parseInt(document.getElementById('f_sort').value, 10),
             detailContent: document.getElementById('f_detail').value
         };
-        if (!payload.wareKey) {
-            alert('茶器标识不能为空');
+        if (!payload.name) {
+            alert('茶器名称不能为空');
             return;
         }
         const r = id ? await API.AdminTeaWare.update(id, payload) : await API.AdminTeaWare.create(payload);
@@ -144,7 +138,10 @@ window.openEditor = function (id) {
     if (imageFile && imagePreview) {
         imageFile.addEventListener('change', () => {
             const file = imageFile.files && imageFile.files[0];
-            if (file) imagePreview.src = URL.createObjectURL(file);
+            if (file) {
+                imagePreview.src = URL.createObjectURL(file);
+                imagePreview.style.display = 'block';
+            }
         });
     }
 };

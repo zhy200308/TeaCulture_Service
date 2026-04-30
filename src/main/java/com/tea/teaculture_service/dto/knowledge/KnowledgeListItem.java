@@ -12,7 +12,6 @@ public class KnowledgeListItem {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id;
-    private String knowledgeKey;
     private String categoryCode;
     private String categoryName;
     private String title;
@@ -21,4 +20,3 @@ public class KnowledgeListItem {
     private Integer viewCount;
     private Integer status;
 }
-

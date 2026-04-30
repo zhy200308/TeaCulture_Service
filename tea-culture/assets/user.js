@@ -73,7 +73,7 @@ function showProfileModal() {
                 <div class="form-item">
                     <label>头像预览</label>
                     <div style="display:flex;align-items:center;gap:12px;">
-                        <img id="avatarPreview" src="${user.avatar || ''}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #eee;">
+                        <img id="avatarPreview" src="${user.avatar || ''}" style="display:${user.avatar ? 'block' : 'none'};width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #eee;">
                         <div style="color:#888;font-size:13px;">选择后可预览，不满意可重新选择</div>
                     </div>
                 </div>
@@ -123,6 +123,7 @@ function bindAvatarPreview() {
         if (!file) return;
         const url = URL.createObjectURL(file);
         preview.src = url;
+        preview.style.display = 'block';
     });
 }
 
@@ -193,8 +194,8 @@ async function showFavoriteModal() {
         : records.map(f => `
             <div class="fav-item">
                 <span class="fav-type">${typeMap[f.targetType] || f.targetType}</span>
-                <span class="fav-title" style="cursor:pointer;" onclick="openFavoriteDetail('${f.targetType}', '${f.targetKey}', ${f.targetId})">${f.targetTitle || f.targetKey}</span>
-                <button onclick="openFavoriteDetail('${f.targetType}', '${f.targetKey}', ${f.targetId})" style="background:#4a7c59;">查看</button>
+                <span class="fav-title" style="cursor:pointer;" onclick="openFavoriteDetail('${f.targetType}', ${f.targetId})">${f.targetTitle || ''}</span>
+                <button onclick="openFavoriteDetail('${f.targetType}', ${f.targetId})" style="background:#4a7c59;">查看</button>
                 <button onclick="removeFavorite('${f.targetType}', ${f.targetId}, this)">取消</button>
             </div>
         `).join('');
@@ -225,7 +226,7 @@ window.removeFavorite = async function (targetType, targetId, btn) {
     }
 };
 
-window.openFavoriteDetail = async function (targetType, targetKey, targetId) {
+window.openFavoriteDetail = async function (targetType, targetId) {
     const html = `
         <div class="user-modal-mask" onclick="closeUserModal(event)">
             <div class="user-modal" onclick="event.stopPropagation()" style="max-width:760px;">
@@ -244,10 +245,10 @@ window.openFavoriteDetail = async function (targetType, targetKey, targetId) {
     box.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">加载中...</p>';
 
     let result = null;
-    if (targetType === 'knowledge') result = await API.Knowledge.getByKey(targetKey);
-    else if (targetType === 'topic') result = await API.Topic.getByKey(targetKey);
-    else if (targetType === 'scenario') result = await API.Scenario.getByKey(targetKey);
-    else if (targetType === 'food') result = await API.TeaFood.getByKey(targetKey);
+    if (targetType === 'knowledge') result = await API.Knowledge.getById(targetId);
+    else if (targetType === 'topic') result = await API.Topic.getById(targetId);
+    else if (targetType === 'scenario') result = await API.Scenario.getById(targetId);
+    else if (targetType === 'food') result = await API.TeaFood.getById(targetId);
 
     if (!result || result.code !== 200 || !result.data) {
         box.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">内容加载失败</p>';

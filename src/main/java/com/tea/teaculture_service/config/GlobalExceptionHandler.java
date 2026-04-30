@@ -33,11 +33,8 @@ public class GlobalExceptionHandler {
     }
 
     private static String toDuplicateTip(String msg) {
-        if (msg.contains("uk_scenario_key")) return "场景标识已存在";
-        if (msg.contains("uk_knowledge_key")) return "茶识标识已存在";
-        if (msg.contains("uk_topic_key")) return "专题标识已存在";
-        if (msg.contains("uk_match_key")) return "茶食搭配标识已存在";
-        if (msg.contains("uk_ware_key")) return "茶器标识已存在";
+        if (msg.contains("uk_scenario_id")) return "该场景已存在冲泡参数记录";
+        if (msg.contains("uk_user_target")) return "已收藏";
         if (msg.contains("uk_category_code")) return "分类编码已存在";
         if (msg.contains("uk_topic_code")) return "分类编码已存在";
         if (msg.contains("uk_tea_type_code")) return "茶类编码已存在";

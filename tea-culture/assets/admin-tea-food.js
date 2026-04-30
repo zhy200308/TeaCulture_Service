@@ -56,7 +56,7 @@ async function load() {
                 <td>${m.status === true || m.status === 1 ? '<span class="tag">已发布</span>' : '<span class="tag" style="background:#fff1f1;color:#ff5252;">草稿</span>'}</td>
                 <td>
                     <div class="row-actions">
-                        <button class="btn light" onclick="openEditor('${m.id}','${m.matchKey}')">编辑</button>
+                        <button class="btn light" onclick="openEditor('${m.id}')">编辑</button>
                         <button class="btn danger" onclick="deleteRow('${m.id}')">删除</button>
                     </div>
                 </td>
@@ -78,19 +78,15 @@ function changePage(delta) {
     load();
 }
 
-window.openEditor = async function (id, matchKey) {
+window.openEditor = async function (id) {
     let data = { status: 1 };
-    if (matchKey) {
-        const r = await API.TeaFood.getByKey(matchKey);
+    if (id) {
+        const r = await API.TeaFood.getById(id);
         if (r.code === 200 && r.data) data = r.data.match || r.data;
     }
 
     AdminCommon.openModal(id ? '编辑茶食搭配' : '新增茶食搭配', `
         <div class="form-grid">
-            <div class="form-item">
-                <label>内容标识（唯一）</label>
-                <input id="f_key" type="text" value="${escapeHtml(data.matchKey || '')}" ${id ? 'disabled' : ''}>
-            </div>
             <div class="form-item">
                 <label>茶类编码</label>
                 <input id="f_teaTypeCode" type="text" value="${escapeHtml(data.teaTypeCode || '')}">
@@ -111,7 +107,7 @@ window.openEditor = async function (id, matchKey) {
                 <label>封面图</label>
                 <input id="f_coverFile" type="file" accept="image/*">
                 <input id="f_cover" type="hidden" value="${escapeHtml(data.coverImage || '')}">
-                <img id="f_coverPreview" src="${escapeHtml(data.coverImage || '')}" style="margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
+                <img id="f_coverPreview" src="${escapeHtml(data.coverImage || '')}" style="display:${data.coverImage ? 'block' : 'none'};margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
             </div>
             <div class="form-item">
                 <label>状态</label>
@@ -145,7 +141,6 @@ window.openEditor = async function (id, matchKey) {
             coverImage = up.data;
         }
         const payload = {
-            matchKey: document.getElementById('f_key').value.trim(),
             teaTypeCode: document.getElementById('f_teaTypeCode').value.trim(),
             teaName: document.getElementById('f_teaName').value.trim(),
             foodName: document.getElementById('f_foodName').value.trim(),
@@ -156,8 +151,8 @@ window.openEditor = async function (id, matchKey) {
             status: parseInt(document.getElementById('f_status').value, 10),
             sortOrder: document.getElementById('f_sort').value === '' ? null : parseInt(document.getElementById('f_sort').value, 10)
         };
-        if (!id && !payload.matchKey) {
-            alert('内容标识不能为空');
+        if (!payload.title) {
+            alert('标题不能为空');
             return;
         }
         const r = id ? await API.TeaFood.update(id, payload) : await API.TeaFood.create(payload);
@@ -174,7 +169,10 @@ window.openEditor = async function (id, matchKey) {
     if (coverFile && coverPreview) {
         coverFile.addEventListener('change', () => {
             const file = coverFile.files && coverFile.files[0];
-            if (file) coverPreview.src = URL.createObjectURL(file);
+            if (file) {
+                coverPreview.src = URL.createObjectURL(file);
+                coverPreview.style.display = 'block';
+            }
         });
     }
 

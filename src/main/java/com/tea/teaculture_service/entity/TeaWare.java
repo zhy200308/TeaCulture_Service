@@ -38,11 +38,6 @@ public class TeaWare extends Model<TeaWare> {
     private Long id;
 
 
-    @Schema(description = "业务标识")
-    @TableField("ware_key")
-    private String wareKey;
-
-
     @Schema(description = "茶器名称")
     @TableField("name")
     private String name;
@@ -53,7 +48,7 @@ public class TeaWare extends Model<TeaWare> {
     private String image;
 
 
-    @Schema(description = "使用指南HTML")
+    @Schema(description = "使用指南内容")
     @TableField("detail_content")
     private String detailContent;
 

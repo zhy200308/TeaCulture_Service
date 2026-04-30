@@ -1,20 +1,38 @@
 document.addEventListener('DOMContentLoaded', async () => {
     if (!AdminCommon.requireAdmin()) return;
     AdminCommon.bindAdminHeader();
+    await loadScenarioOptions();
     hydrateFiltersFromQuery();
     bindEvents();
     await load();
 });
 
+let __scenarioMap = new Map();
+
+async function loadScenarioOptions() {
+    const sel = document.getElementById('scenarioId');
+    if (!sel) return;
+    const r = await API.Scenario.list({ pageNum: 1, pageSize: 200 });
+    if (r.code !== 200) return;
+    const records = r.data?.records || [];
+    __scenarioMap = new Map(records.map(s => [String(s.id), s]));
+    records.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `${s.id} - ${s.title || ''}`;
+        sel.appendChild(opt);
+    });
+}
+
 function bindEvents() {
     document.getElementById('searchBtn').addEventListener('click', () => {
-        AdminCommon.setQuery({ pageNum: 1, scenarioKey: document.getElementById('scenarioKey').value.trim(), keyword: document.getElementById('keyword').value.trim() });
+        AdminCommon.setQuery({ pageNum: 1, scenarioId: document.getElementById('scenarioId').value, keyword: document.getElementById('keyword').value.trim() });
         load();
     });
     document.getElementById('resetBtn').addEventListener('click', () => {
-        document.getElementById('scenarioKey').value = '';
+        document.getElementById('scenarioId').value = '';
         document.getElementById('keyword').value = '';
-        AdminCommon.setQuery({ pageNum: 1, scenarioKey: '', keyword: '' });
+        AdminCommon.setQuery({ pageNum: 1, scenarioId: '', keyword: '' });
         load();
     });
     document.getElementById('addBtn').addEventListener('click', () => openEditor());
@@ -28,16 +46,16 @@ function bindEvents() {
 
 function hydrateFiltersFromQuery() {
     const sp = new URLSearchParams(location.search);
-    document.getElementById('scenarioKey').value = sp.get('scenarioKey') || '';
+    document.getElementById('scenarioId').value = sp.get('scenarioId') || '';
     document.getElementById('keyword').value = sp.get('keyword') || '';
 }
 
 async function load() {
     const pageNum = AdminCommon.getQueryInt('pageNum', 1);
-    const scenarioKey = document.getElementById('scenarioKey').value.trim();
+    const scenarioId = document.getElementById('scenarioId').value;
     const keyword = document.getElementById('keyword').value.trim();
     const params = { pageNum, pageSize: 20 };
-    if (scenarioKey) params.scenarioKey = scenarioKey;
+    if (scenarioId) params.scenarioId = scenarioId;
     if (keyword) params.keyword = keyword;
     const result = await API.AdminBrewingParam.list(params);
 
@@ -55,7 +73,7 @@ async function load() {
             <tr>
                 <td><input type="checkbox" name="rowId" value="${p.id}"></td>
                 <td>${p.id}</td>
-                <td>${escapeHtml(p.scenarioKey || '')}</td>
+                <td>${escapeHtml(resolveScenarioTitle(p.scenarioId) || String(p.scenarioId || ''))}</td>
                 <td>${escapeHtml(p.teaType || '')}</td>
                 <td>${escapeHtml(p.waterTemp || '')}</td>
                 <td>${escapeHtml(p.amount || '')}</td>
@@ -77,6 +95,12 @@ async function load() {
     document.getElementById('checkAll').checked = false;
 }
 
+function resolveScenarioTitle(scenarioId) {
+    if (scenarioId == null) return '';
+    const s = __scenarioMap ? __scenarioMap.get(String(scenarioId)) : null;
+    return s ? `${s.id} - ${s.title || ''}` : '';
+}
+
 function changePage(delta) {
     const pageNum = AdminCommon.getQueryInt('pageNum', 1);
     const next = Math.max(1, pageNum + delta);
@@ -89,8 +113,8 @@ window.openEditor = function (id) {
     AdminCommon.openModal(id ? '编辑冲泡参数' : '新增冲泡参数', `
         <div class="form-grid">
             <div class="form-item">
-                <label>场景内容标识</label>
-                <input id="f_scenarioKey" type="text" value="${escapeHtml(data.scenarioKey || '')}">
+                <label>场景</label>
+                <select id="f_scenarioId"></select>
             </div>
             <div class="form-item">
                 <label>茶类</label>
@@ -115,15 +139,15 @@ window.openEditor = function (id) {
         </div>
     `, async () => {
         const payload = {
-            scenarioKey: document.getElementById('f_scenarioKey').value.trim(),
+            scenarioId: parseInt(document.getElementById('f_scenarioId').value, 10),
             teaType: document.getElementById('f_teaType').value.trim(),
             amount: document.getElementById('f_amount').value.trim(),
             waterTemp: document.getElementById('f_waterTemp').value.trim(),
             brewTime: document.getElementById('f_brewTime').value.trim(),
             note: document.getElementById('f_note').value
         };
-        if (!payload.scenarioKey) {
-            alert('场景内容标识不能为空');
+        if (!payload.scenarioId) {
+            alert('请选择场景');
             return;
         }
         const r = id ? await API.AdminBrewingParam.update(id, payload) : await API.AdminBrewingParam.create(payload);
@@ -134,6 +158,19 @@ window.openEditor = function (id) {
             alert(r.message || '保存失败');
         }
     });
+
+    const sel = document.getElementById('f_scenarioId');
+    const baseSel = document.getElementById('scenarioId');
+    if (sel && baseSel) {
+        Array.from(baseSel.options).forEach(opt => {
+            if (!opt.value) return;
+            const o = document.createElement('option');
+            o.value = opt.value;
+            o.textContent = opt.textContent;
+            sel.appendChild(o);
+        });
+        sel.value = data.scenarioId == null ? '' : String(data.scenarioId);
+    }
 };
 
 window.deleteRow = async function (id) {

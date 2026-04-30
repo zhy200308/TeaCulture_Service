@@ -69,7 +69,7 @@ async function load() {
                 <td>${k.status === 1 ? '<span class="tag">已发布</span>' : '<span class="tag" style="background:#fff1f1;color:#ff5252;">草稿</span>'}</td>
                 <td>
                     <div class="row-actions">
-                        <button class="btn light" onclick="openEditor('${k.id}','${k.knowledgeKey}')">编辑</button>
+                        <button class="btn light" onclick="openEditor('${k.id}')">编辑</button>
                         <button class="btn danger" onclick="deleteRow('${k.id}')">删除</button>
                     </div>
                 </td>
@@ -91,19 +91,15 @@ function changePage(delta) {
     load();
 }
 
-window.openEditor = async function (id, knowledgeKey) {
+window.openEditor = async function (id) {
     let data = { status: 1 };
-    if (knowledgeKey) {
-        const r = await API.Knowledge.getByKey(knowledgeKey);
+    if (id) {
+        const r = await API.Knowledge.getById(id);
         if (r.code === 200 && r.data) data = r.data;
     }
 
     AdminCommon.openModal(id ? '编辑茶识' : '新增茶识', `
         <div class="form-grid">
-            <div class="form-item">
-                <label>内容标识（唯一）</label>
-                <input id="f_key" type="text" value="${escapeHtml(data.knowledgeKey || '')}" ${id ? 'disabled' : ''}>
-            </div>
             <div class="form-item">
                 <label>分类</label>
                 <select id="f_category"></select>
@@ -116,7 +112,7 @@ window.openEditor = async function (id, knowledgeKey) {
                 <label>封面图</label>
                 <input id="f_coverFile" type="file" accept="image/*">
                 <input id="f_cover" type="hidden" value="${escapeHtml(data.coverImage || '')}">
-                <img id="f_coverPreview" src="${escapeHtml(data.coverImage || '')}" style="margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
+                <img id="f_coverPreview" src="${escapeHtml(data.coverImage || '')}" style="display:${data.coverImage ? 'block' : 'none'};margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
             </div>
             <div class="form-item" style="grid-column:1/-1;">
                 <label>摘要</label>
@@ -150,7 +146,6 @@ window.openEditor = async function (id, knowledgeKey) {
             coverImage = up.data;
         }
         const payload = {
-            knowledgeKey: document.getElementById('f_key').value.trim(),
             categoryCode: document.getElementById('f_category').value,
             title: document.getElementById('f_title').value.trim(),
             coverImage,
@@ -159,8 +154,8 @@ window.openEditor = async function (id, knowledgeKey) {
             status: parseInt(document.getElementById('f_status').value, 10),
             sortOrder: document.getElementById('f_sort').value === '' ? null : parseInt(document.getElementById('f_sort').value, 10)
         };
-        if (!id && !payload.knowledgeKey) {
-            alert('内容标识不能为空');
+        if (!payload.title) {
+            alert('标题不能为空');
             return;
         }
         const r = id ? await API.Knowledge.update(id, payload) : await API.Knowledge.create(payload);
@@ -177,7 +172,10 @@ window.openEditor = async function (id, knowledgeKey) {
     if (coverFile && coverPreview) {
         coverFile.addEventListener('change', () => {
             const file = coverFile.files && coverFile.files[0];
-            if (file) coverPreview.src = URL.createObjectURL(file);
+            if (file) {
+                coverPreview.src = URL.createObjectURL(file);
+                coverPreview.style.display = 'block';
+            }
         });
     }
 

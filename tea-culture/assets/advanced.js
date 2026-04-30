@@ -75,24 +75,24 @@ async function loadTopicList() {
                 <span class="topic-tag">${item.topicName || ''}</span>
                 <h3>${item.title}</h3>
                 <p class="topic-desc">${item.summary || ''}</p>
-                <div class="detail-btn" onclick="openTopicModal('${item.topicKey}', ${item.id})">查看详情</div>
+                <div class="detail-btn" onclick="openTopicModal(${item.id})">查看详情</div>
             </div>
         </div>
     `).join('');
 }
 
 // ===== 显示专题详情 =====
-async function openTopicModal(topicKey, id) {
+async function openTopicModal(id) {
     const modal = document.getElementById('detailModal');
     const modalContent = document.getElementById('modalContent');
     modalContent.innerHTML = '<p style="text-align:center;padding:40px;">加载中...</p>';
     modal.classList.add('active');
 
-    const result = await API.Topic.getByKey(topicKey);
+    const result = await API.Topic.getById(id);
     if (result.code === 200 && result.data) {
         modalContent.innerHTML = renderTextDetail(result.data.detailContent);
         // 添加收藏按钮
-        appendFavoriteBtn(modalContent, 'topic', id, topicKey);
+        appendFavoriteBtn(modalContent, 'topic', id);
     } else {
         modalContent.innerHTML = '<h3>内容加载失败</h3><p>请稍后重试</p>';
     }
@@ -108,7 +108,7 @@ function escapeHtml(str) {
     return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function appendFavoriteBtn(container, targetType, targetId, targetKey) {
+function appendFavoriteBtn(container, targetType, targetId) {
     const btn = document.createElement('button');
     btn.style.cssText = 'margin-top:15px;padding:8px 18px;border:1px solid #ddd;border-radius:6px;cursor:pointer;background:#fff;color:#8b5a2b;';
     let isFavorite = false;
@@ -150,7 +150,7 @@ function appendFavoriteBtn(container, targetType, targetId, targetKey) {
                 alert(r.message || '取消收藏失败');
             }
         } else {
-            const r = await API.Favorite.add(targetType, targetId, targetKey);
+            const r = await API.Favorite.add(targetType, targetId);
             if (r.code === 200) {
                 isFavorite = true;
                 render();

@@ -46,10 +46,10 @@ public class TeaFoodController {
         return ApiResponse.ok(list);
     }
 
-    @GetMapping("/detail/{key}")
-    public ApiResponse<TeaFoodDetailResponse> detail(@PathVariable("key") String key) {
+    @GetMapping("/detail/{id}")
+    public ApiResponse<TeaFoodDetailResponse> detail(@PathVariable("id") Long id) {
         TeaFoodMatch match = teaFoodMatchService.getOne(new LambdaQueryWrapper<TeaFoodMatch>()
-                .eq(TeaFoodMatch::getMatchKey, key)
+                .eq(TeaFoodMatch::getId, id)
                 .eq(TeaFoodMatch::getDeleted, false)
                 .last("limit 1"));
         if (match == null) {
@@ -115,11 +115,10 @@ public class TeaFoodController {
         if (!UserContext.isAdmin()) {
             return ApiResponse.forbidden("无权限");
         }
-        if (req == null || req.getMatchKey() == null || req.getMatchKey().isBlank()) {
-            return ApiResponse.badRequest("matchKey不能为空");
+        if (req == null || req.getTitle() == null || req.getTitle().isBlank()) {
+            return ApiResponse.badRequest("标题不能为空");
         }
         TeaFoodMatch entity = new TeaFoodMatch()
-                .setMatchKey(req.getMatchKey())
                 .setTeaTypeCode(req.getTeaTypeCode())
                 .setTeaName(req.getTeaName())
                 .setFoodName(req.getFoodName())
@@ -144,7 +143,6 @@ public class TeaFoodController {
             return ApiResponse.fail("内容不存在");
         }
         TeaFoodMatch upd = new TeaFoodMatch().setId(id);
-        if (req.getMatchKey() != null) upd.setMatchKey(req.getMatchKey());
         if (req.getTeaTypeCode() != null) upd.setTeaTypeCode(req.getTeaTypeCode());
         if (req.getTeaName() != null) upd.setTeaName(req.getTeaName());
         if (req.getFoodName() != null) upd.setFoodName(req.getFoodName());

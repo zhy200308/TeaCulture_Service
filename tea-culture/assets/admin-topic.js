@@ -69,7 +69,7 @@ async function load() {
                 <td>${t.status === 1 ? '<span class="tag">已发布</span>' : '<span class="tag" style="background:#fff1f1;color:#ff5252;">草稿</span>'}</td>
                 <td>
                     <div class="row-actions">
-                        <button class="btn light" onclick="openEditor('${t.id}','${t.topicKey}')">编辑</button>
+                        <button class="btn light" onclick="openEditor('${t.id}')">编辑</button>
                         <button class="btn danger" onclick="deleteRow('${t.id}')">删除</button>
                     </div>
                 </td>
@@ -91,19 +91,15 @@ function changePage(delta) {
     load();
 }
 
-window.openEditor = async function (id, topicKey) {
+window.openEditor = async function (id) {
     let data = { status: 1 };
-    if (topicKey) {
-        const r = await API.Topic.getByKey(topicKey);
+    if (id) {
+        const r = await API.Topic.getById(id);
         if (r.code === 200 && r.data) data = r.data;
     }
 
     AdminCommon.openModal(id ? '编辑专题' : '新增专题', `
         <div class="form-grid">
-            <div class="form-item">
-                <label>内容标识（唯一）</label>
-                <input id="f_key" type="text" value="${escapeHtml(data.topicKey || '')}" ${id ? 'disabled' : ''}>
-            </div>
             <div class="form-item">
                 <label>分类</label>
                 <select id="f_code"></select>
@@ -116,13 +112,13 @@ window.openEditor = async function (id, topicKey) {
                 <label>封面图</label>
                 <input id="f_coverFile" type="file" accept="image/*">
                 <input id="f_cover" type="hidden" value="${escapeHtml(data.coverImage || '')}">
-                <img id="f_coverPreview" src="${escapeHtml(data.coverImage || '')}" style="margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
+                <img id="f_coverPreview" src="${escapeHtml(data.coverImage || '')}" style="display:${data.coverImage ? 'block' : 'none'};margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
             </div>
             <div class="form-item">
                 <label>音频文件（可选）</label>
                 <input id="f_audioFile" type="file" accept="audio/*">
                 <input id="f_audio" type="hidden" value="${escapeHtml(data.audioUrl || '')}">
-                <div style="margin-top:8px;color:#666;font-size:13px;word-break:break-all;" id="f_audioText">${escapeHtml(data.audioUrl || '')}</div>
+                <div style="display:${data.audioUrl ? 'block' : 'none'};margin-top:8px;color:#666;font-size:13px;word-break:break-all;" id="f_audioText">${escapeHtml(data.audioUrl || '')}</div>
             </div>
             <div class="form-item">
                 <label>状态</label>
@@ -163,7 +159,6 @@ window.openEditor = async function (id, topicKey) {
             audioUrl = up.data;
         }
         const payload = {
-            topicKey: document.getElementById('f_key').value.trim(),
             topicCode: document.getElementById('f_code').value,
             title: document.getElementById('f_title').value.trim(),
             coverImage,
@@ -172,8 +167,8 @@ window.openEditor = async function (id, topicKey) {
             detailContent: document.getElementById('f_detail').value,
             status: parseInt(document.getElementById('f_status').value, 10)
         };
-        if (!id && !payload.topicKey) {
-            alert('内容标识不能为空');
+        if (!payload.title) {
+            alert('标题不能为空');
             return;
         }
         const r = id ? await API.Topic.update(id, payload) : await API.Topic.create(payload);
@@ -190,7 +185,10 @@ window.openEditor = async function (id, topicKey) {
     if (coverFile && coverPreview) {
         coverFile.addEventListener('change', () => {
             const file = coverFile.files && coverFile.files[0];
-            if (file) coverPreview.src = URL.createObjectURL(file);
+            if (file) {
+                coverPreview.src = URL.createObjectURL(file);
+                coverPreview.style.display = 'block';
+            }
         });
     }
     const audioFile = document.getElementById('f_audioFile');
@@ -198,7 +196,10 @@ window.openEditor = async function (id, topicKey) {
     if (audioFile && audioText) {
         audioFile.addEventListener('change', () => {
             const file = audioFile.files && audioFile.files[0];
-            if (file) audioText.innerText = file.name;
+            if (file) {
+                audioText.innerText = file.name;
+                audioText.style.display = 'block';
+            }
         });
     }
 

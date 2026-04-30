@@ -3,9 +3,9 @@
  * 对接接口：
  *   - GET /api/knowledge/categories       查询分类
  *   - GET /api/knowledge/list              查询知识列表
- *   - GET /api/knowledge/detail/{key}      查询知识详情
+ *   - GET /api/knowledge/detail/{id}       查询知识详情
  *   - GET /api/knowledge/wares             查询茶器列表
- *   - GET /api/knowledge/wares/{key}       查询茶器详情
+ *   - GET /api/knowledge/wares/{id}        查询茶器详情
  *   - POST /api/favorite                   收藏
  */
 
@@ -83,7 +83,7 @@ async function loadKnowledgeList() {
     }
 
     list.innerHTML = records.map(item => `
-        <div class="knowledge-card" data-key="${item.knowledgeKey}" data-id="${item.id}" onclick="showKnowledgeDetail('${item.knowledgeKey}', ${item.id})">
+        <div class="knowledge-card" data-id="${item.id}" onclick="showKnowledgeDetail(${item.id})">
             <span class="knowledge-tag">${item.categoryName || ''}</span>
             <h4 class="knowledge-title">${item.title}</h4>
             <p class="knowledge-desc">${item.summary || ''}</p>
@@ -100,7 +100,7 @@ async function loadWares() {
     if (result.code !== 200) return;
 
     list.innerHTML = (result.data || []).map(w => `
-        <div class="teaware-card" onclick="showWareDetail('${w.wareKey}')">
+        <div class="teaware-card" onclick="showWareDetail(${w.id})">
             <img src="${w.image || ''}" alt="${w.name}">
             <div class="teaware-name">${w.name}</div>
         </div>
@@ -108,30 +108,30 @@ async function loadWares() {
 }
 
 // ===== 显示知识详情 =====
-async function showKnowledgeDetail(key, id) {
+async function showKnowledgeDetail(id) {
     const modal = document.getElementById('detailModal');
     const modalContent = document.getElementById('modalContent');
     modalContent.innerHTML = '<p style="text-align:center;padding:40px;">加载中...</p>';
     modal.classList.add('active');
 
-    const result = await API.Knowledge.getByKey(key);
+    const result = await API.Knowledge.getById(id);
     if (result.code === 200 && result.data) {
         modalContent.innerHTML = renderTextDetail(result.data.detailContent);
         // 收藏按钮
-        appendFavoriteBtn(modalContent, 'knowledge', id, key);
+        appendFavoriteBtn(modalContent, 'knowledge', id);
     } else {
         modalContent.innerHTML = '<h3>内容加载失败</h3><p>请稍后重试</p>';
     }
 }
 
 // ===== 显示茶器详情 =====
-async function showWareDetail(key) {
+async function showWareDetail(id) {
     const modal = document.getElementById('detailModal');
     const modalContent = document.getElementById('modalContent');
     modalContent.innerHTML = '<p style="text-align:center;padding:40px;">加载中...</p>';
     modal.classList.add('active');
 
-    const result = await API.Knowledge.getWareByKey(key);
+    const result = await API.Knowledge.getWareById(id);
     if (result.code === 200 && result.data) {
         modalContent.innerHTML = renderTextDetail(result.data.detailContent);
     } else {
@@ -150,7 +150,7 @@ function escapeHtml(str) {
 }
 
 // ===== 添加收藏按钮 =====
-function appendFavoriteBtn(container, targetType, targetId, targetKey) {
+function appendFavoriteBtn(container, targetType, targetId) {
     const btn = document.createElement('button');
     btn.style.cssText = 'margin-top:15px;padding:8px 18px;border:1px solid #ddd;border-radius:6px;cursor:pointer;background:#fff;color:#8b5a2b;';
     let isFavorite = false;
@@ -192,7 +192,7 @@ function appendFavoriteBtn(container, targetType, targetId, targetKey) {
                 alert(r.message || '取消收藏失败');
             }
         } else {
-            const r = await API.Favorite.add(targetType, targetId, targetKey);
+            const r = await API.Favorite.add(targetType, targetId);
             if (r.code === 200) {
                 isFavorite = true;
                 render();

@@ -40,8 +40,7 @@ public class AdminTeaWareController {
                 new LambdaQueryWrapper<TeaWare>()
                         .eq(TeaWare::getDeleted, false)
                         .and(keyword != null && !keyword.isBlank(),
-                                w -> w.like(TeaWare::getWareKey, keyword)
-                                        .or().like(TeaWare::getName, keyword)
+                                w -> w.like(TeaWare::getName, keyword)
                                         .or().like(TeaWare::getSuitableTea, keyword))
                         .orderByAsc(TeaWare::getSortOrder)
                         .orderByDesc(TeaWare::getUpdateTime));
@@ -58,11 +57,10 @@ public class AdminTeaWareController {
         if (!UserContext.isAdmin()) {
             return ApiResponse.forbidden("无权限");
         }
-        if (req == null || req.getWareKey() == null || req.getWareKey().isBlank()) {
-            return ApiResponse.badRequest("wareKey不能为空");
+        if (req == null || req.getName() == null || req.getName().isBlank()) {
+            return ApiResponse.badRequest("名称不能为空");
         }
         TeaWare entity = new TeaWare()
-                .setWareKey(req.getWareKey())
                 .setName(req.getName())
                 .setImage(req.getImage())
                 .setDetailContent(req.getDetailContent())
@@ -83,7 +81,6 @@ public class AdminTeaWareController {
             return ApiResponse.fail("内容不存在");
         }
         TeaWare upd = new TeaWare().setId(id);
-        if (req.getWareKey() != null) upd.setWareKey(req.getWareKey());
         if (req.getName() != null) upd.setName(req.getName());
         if (req.getImage() != null) upd.setImage(req.getImage());
         if (req.getDetailContent() != null) upd.setDetailContent(req.getDetailContent());
@@ -114,4 +111,3 @@ public class AdminTeaWareController {
         return ApiResponse.ok();
     }
 }
-
