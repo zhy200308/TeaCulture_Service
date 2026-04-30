@@ -130,7 +130,7 @@ window.saveProfile = async function () {
 
 // ===== 我的收藏弹窗 =====
 async function showFavoriteModal() {
-    const result = await API.Favorite.list();
+    const result = await API.Favorite.list({ pageNum: 1, pageSize: 200 });
     const records = result.data?.records || result.data || [];
 
     const typeMap = { knowledge: '茶识', topic: '专题', scenario: '教程', food: '茶食搭配' };
@@ -139,7 +139,8 @@ async function showFavoriteModal() {
         : records.map(f => `
             <div class="fav-item">
                 <span class="fav-type">${typeMap[f.targetType] || f.targetType}</span>
-                <span class="fav-title">${f.targetTitle || f.targetKey}</span>
+                <span class="fav-title" style="cursor:pointer;" onclick="openFavoriteDetail('${f.targetType}', '${f.targetKey}', ${f.targetId})">${f.targetTitle || f.targetKey}</span>
+                <button onclick="openFavoriteDetail('${f.targetType}', '${f.targetKey}', ${f.targetId})" style="background:#4a7c59;">查看</button>
                 <button onclick="removeFavorite('${f.targetType}', ${f.targetId}, this)">取消</button>
             </div>
         `).join('');
@@ -162,9 +163,78 @@ window.removeFavorite = async function (targetType, targetId, btn) {
     if (!confirm('确定要取消收藏吗？')) return;
     const result = await API.Favorite.remove(targetType, targetId);
     if (result.code === 200) {
-        btn.closest('.fav-item').remove();
+        const item = btn && btn.closest ? btn.closest('.fav-item') : null;
+        if (item) item.remove();
+        else closeUserModal();
     } else {
         alert(result.message || '取消失败');
+    }
+};
+
+window.openFavoriteDetail = async function (targetType, targetKey, targetId) {
+    const html = `
+        <div class="user-modal-mask" onclick="closeUserModal(event)">
+            <div class="user-modal" onclick="event.stopPropagation()" style="max-width:760px;">
+                <h3>收藏详情</h3>
+                <div id="favDetailContent" style="min-height:120px;"></div>
+                <div class="modal-btns">
+                    <button onclick="closeUserModal()">关闭</button>
+                    <button class="primary" onclick="removeFavorite('${targetType}', ${targetId}, this)">取消收藏</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+    const box = document.getElementById('favDetailContent');
+    if (!box) return;
+    box.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">加载中...</p>';
+
+    let result = null;
+    if (targetType === 'knowledge') result = await API.Knowledge.getByKey(targetKey);
+    else if (targetType === 'topic') result = await API.Topic.getByKey(targetKey);
+    else if (targetType === 'scenario') result = await API.Scenario.getByKey(targetKey);
+    else if (targetType === 'food') result = await API.TeaFood.getByKey(targetKey);
+
+    if (!result || result.code !== 200 || !result.data) {
+        box.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">内容加载失败</p>';
+        return;
+    }
+
+    if (targetType === 'scenario') {
+        const scenario = result.data.scenario || result.data;
+        const param = result.data.brewingParam || {};
+        box.innerHTML = `
+            <h4 style="margin:10px 0;color:#4a7c59;">${scenario.title || ''}</h4>
+            <div>${scenario.detailContent || ''}</div>
+            <div style="margin-top:15px;background:#f8f6f2;border-radius:10px;padding:12px;">
+                <div style="font-weight:600;color:#4a7c59;margin-bottom:8px;">推荐冲泡参数</div>
+                <div>茶类：${param.teaType || '—'}</div>
+                <div>投茶量：${param.amount || '—'}</div>
+                <div>水温：${param.waterTemp || '—'}</div>
+                <div>冲泡时长：${param.brewTime || '—'}</div>
+                <div>备注：${param.note || '—'}</div>
+            </div>
+        `;
+    } else if (targetType === 'food') {
+        const match = result.data.match || result.data;
+        const param = result.data.teaTypeParam || {};
+        box.innerHTML = `
+            <h4 style="margin:10px 0;color:#4a7c59;">${match.title || ''}</h4>
+            <div>${match.detailContent || ''}</div>
+            <div style="margin-top:15px;background:#f8f6f2;border-radius:10px;padding:12px;">
+                <div style="font-weight:600;color:#4a7c59;margin-bottom:8px;">智能茶器参数推荐</div>
+                <div>水温：${param.waterTemp || '—'}</div>
+                <div>投茶量：${param.amount || '—'}</div>
+                <div>冲泡时长：${param.brewTime || '—'}</div>
+                <div>备注：${param.note || '—'}</div>
+            </div>
+        `;
+    } else {
+        const data = result.data;
+        box.innerHTML = `
+            <h4 style="margin:10px 0;color:#4a7c59;">${data.title || ''}</h4>
+            <div>${data.detailContent || ''}</div>
+        `;
     }
 };
 
@@ -194,10 +264,13 @@ function showFeedbackModal() {
                     <button onclick="closeUserModal()">取消</button>
                     <button class="primary" onclick="submitFeedback()">提交</button>
                 </div>
+                <h4 style="margin-top:20px;">我的反馈记录</h4>
+                <div id="myFeedbackList" style="max-height:320px;overflow:auto;border-top:1px solid #f0f0f0;padding-top:10px;"></div>
             </div>
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', html);
+    loadMyFeedbackList();
 }
 
 window.submitFeedback = async function () {
@@ -219,24 +292,42 @@ window.submitFeedback = async function () {
     }
 };
 
+async function loadMyFeedbackList() {
+    const box = document.getElementById('myFeedbackList');
+    if (!box) return;
+    box.innerHTML = '<p style="text-align:center;color:#999;padding:10px;">加载中...</p>';
+    const result = await API.Feedback.listMine();
+    const records = result.code === 200 ? (result.data || []) : [];
+    if (!records.length) {
+        box.innerHTML = '<p style="text-align:center;color:#999;padding:10px;">暂无反馈</p>';
+        return;
+    }
+    const statusMap = { 0: '未处理', 1: '处理中', 2: '已处理' };
+    box.innerHTML = records.map(f => `
+        <div style="padding:10px;border:1px solid #f0f0f0;border-radius:8px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;gap:10px;">
+                <div style="font-weight:600;color:#4a7c59;">${f.feedbackType || '反馈'}</div>
+                <div style="color:#888;">${statusMap[f.status] || f.status}</div>
+            </div>
+            <div style="margin-top:6px;color:#555;">${(f.content || '').replace(/</g, '&lt;')}</div>
+            ${f.reply ? `<div style="margin-top:8px;background:#f8f6f2;border-radius:8px;padding:8px;"><div style="color:#4a7c59;font-weight:600;">回复</div><div style="color:#555;margin-top:4px;">${(f.reply || '').replace(/</g, '&lt;')}</div></div>` : ''}
+        </div>
+    `).join('');
+}
+
 window.closeUserModal = function (e) {
-    const mask = document.querySelector('.user-modal-mask');
-    if (mask) mask.remove();
+    const masks = document.querySelectorAll('.user-modal-mask');
+    if (masks.length) masks[masks.length - 1].remove();
 };
 
 // ===== 退出登录 =====
 function bindLogoutEvent() {
-    const logoutBtn = document.querySelector('.nav-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async (e) => {
-            // 仅当文字含"返回"或"退出"时拦截
-            const txt = logoutBtn.innerText;
-            if (txt.includes('退出')) {
-                e.preventDefault();
-                await API.Auth.logout();
-                TokenManager.clear();
-                window.location.href = './login.html';
-            }
-        });
-    }
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (!logoutBtn) return;
+    logoutBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await API.Auth.logout();
+        TokenManager.clear();
+        window.location.href = './login.html';
+    });
 }

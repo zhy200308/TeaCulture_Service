@@ -194,6 +194,10 @@ const KnowledgeAPI = {
      */
     delete(id) {
         return http.delete(`/knowledge/${id}`);
+    },
+
+    batchDelete(ids = []) {
+        return http.post('/knowledge/batch-delete', { ids });
     }
 };
 
@@ -246,6 +250,10 @@ const TopicAPI = {
      */
     delete(id) {
         return http.delete(`/topic/${id}`);
+    },
+
+    batchDelete(ids = []) {
+        return http.post('/topic/batch-delete', { ids });
     }
 };
 
@@ -299,6 +307,10 @@ const ScenarioAPI = {
      */
     delete(id) {
         return http.delete(`/scenario/${id}`);
+    },
+
+    batchDelete(ids = []) {
+        return http.post('/scenario/batch-delete', { ids });
     }
 };
 
@@ -336,6 +348,26 @@ const TeaFoodAPI = {
      */
     getTeaTypeParam(teaTypeCode) {
         return http.get(`/tea-food/tea-params/${teaTypeCode}`);
+    },
+
+    adminList(params = {}) {
+        return http.get('/tea-food/admin/list', params);
+    },
+
+    create(data) {
+        return http.post('/tea-food', data);
+    },
+
+    update(id, data) {
+        return http.put(`/tea-food/${id}`, data);
+    },
+
+    delete(id) {
+        return http.delete(`/tea-food/${id}`);
+    },
+
+    batchDelete(ids = []) {
+        return http.post('/tea-food/batch-delete', { ids });
     }
 };
 
@@ -440,6 +472,14 @@ const FeedbackAPI = {
      */
     reply(id, reply, status) {
         return http.put(`/feedback/${id}/reply`, { reply, status });
+    },
+
+    adminDelete(id) {
+        return http.delete(`/feedback/${id}`);
+    },
+
+    adminBatchDelete(ids = []) {
+        return http.post('/feedback/admin/batch-delete', { ids });
     }
 };
 
@@ -496,6 +536,128 @@ const AdminUserAPI = {
      */
     delete(id) {
         return http.delete(`/admin/users/${id}`);
+    },
+
+    batchDelete(ids = []) {
+        return http.post('/admin/users/batch-delete', { ids });
+    }
+};
+
+const AdminFavoriteAPI = {
+    list(params = {}) {
+        return http.get('/admin/favorites', params);
+    },
+
+    delete(id) {
+        return http.delete(`/admin/favorites/${id}`);
+    },
+
+    batchDelete(ids = []) {
+        return http.post('/admin/favorites/batch-delete', { ids });
+    }
+};
+
+const AdminDeviceCommandAPI = {
+    list(params = {}) {
+        return http.get('/admin/device-commands', params);
+    },
+
+    delete(id) {
+        return http.delete(`/admin/device-commands/${id}`);
+    },
+
+    batchDelete(ids = []) {
+        return http.post('/admin/device-commands/batch-delete', { ids });
+    }
+};
+
+const AdminTeaCategoryAPI = {
+    list(params = {}) {
+        return http.get('/admin/knowledge-categories', params);
+    },
+    create(data) {
+        return http.post('/admin/knowledge-categories', data);
+    },
+    update(id, data) {
+        return http.put(`/admin/knowledge-categories/${id}`, data);
+    },
+    delete(id) {
+        return http.delete(`/admin/knowledge-categories/${id}`);
+    },
+    batchDelete(ids = []) {
+        return http.post('/admin/knowledge-categories/batch-delete', { ids });
+    }
+};
+
+const AdminTopicCategoryAPI = {
+    list(params = {}) {
+        return http.get('/admin/topic-categories', params);
+    },
+    create(data) {
+        return http.post('/admin/topic-categories', data);
+    },
+    update(id, data) {
+        return http.put(`/admin/topic-categories/${id}`, data);
+    },
+    delete(id) {
+        return http.delete(`/admin/topic-categories/${id}`);
+    },
+    batchDelete(ids = []) {
+        return http.post('/admin/topic-categories/batch-delete', { ids });
+    }
+};
+
+const AdminTeaWareAPI = {
+    list(params = {}) {
+        return http.get('/admin/tea-wares', params);
+    },
+    create(data) {
+        return http.post('/admin/tea-wares', data);
+    },
+    update(id, data) {
+        return http.put(`/admin/tea-wares/${id}`, data);
+    },
+    delete(id) {
+        return http.delete(`/admin/tea-wares/${id}`);
+    },
+    batchDelete(ids = []) {
+        return http.post('/admin/tea-wares/batch-delete', { ids });
+    }
+};
+
+const AdminBrewingParamAPI = {
+    list(params = {}) {
+        return http.get('/admin/brewing-params', params);
+    },
+    create(data) {
+        return http.post('/admin/brewing-params', data);
+    },
+    update(id, data) {
+        return http.put(`/admin/brewing-params/${id}`, data);
+    },
+    delete(id) {
+        return http.delete(`/admin/brewing-params/${id}`);
+    },
+    batchDelete(ids = []) {
+        return http.post('/admin/brewing-params/batch-delete', { ids });
+    }
+};
+
+const AdminTeaTypeParamAPI = {
+    list(params = {}) {
+        return http.get('/admin/tea-type-params', params);
+    },
+    create(data) {
+        return http.post('/admin/tea-type-params', data);
+    },
+    update(id, data) {
+        return http.put(`/admin/tea-type-params/${id}`, data);
+    },
+    delete(id) {
+        return http.delete(`/admin/tea-type-params/${id}`);
+    },
+    batchDelete(ids = []) {
+        return http.post('/admin/tea-type-params/batch-delete', { ids });
     }
 };
 
@@ -523,6 +685,13 @@ window.API = {
     Feedback: FeedbackAPI,
     Device: DeviceAPI,
     AdminUser: AdminUserAPI,
+    AdminFavorite: AdminFavoriteAPI,
+    AdminDeviceCommand: AdminDeviceCommandAPI,
+    AdminTeaCategory: AdminTeaCategoryAPI,
+    AdminTopicCategory: AdminTopicCategoryAPI,
+    AdminTeaWare: AdminTeaWareAPI,
+    AdminBrewingParam: AdminBrewingParamAPI,
+    AdminTeaTypeParam: AdminTeaTypeParamAPI,
     Search: SearchAPI
 };
 window.TokenManager = TokenManager;

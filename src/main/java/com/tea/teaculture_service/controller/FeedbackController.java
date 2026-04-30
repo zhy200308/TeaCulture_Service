@@ -77,6 +77,7 @@ public class FeedbackController {
 
     @GetMapping("/admin/list")
     public ApiResponse<PageResponse<FeedbackAdminItem>> adminList(@RequestParam(required = false) Integer status,
+                                                                  @RequestParam(required = false) String keyword,
                                                                   @RequestParam(defaultValue = "1") Long pageNum,
                                                                   @RequestParam(defaultValue = "20") Long pageSize) {
         if (!UserContext.isAdmin()) {
@@ -86,6 +87,7 @@ public class FeedbackController {
                 new LambdaQueryWrapper<UserFeedback>()
                         .eq(UserFeedback::getDeleted, false)
                         .eq(status != null, UserFeedback::getStatus, status)
+                        .and(keyword != null && !keyword.isBlank(), w -> w.like(UserFeedback::getContent, keyword).or().like(UserFeedback::getContact, keyword))
                         .orderByDesc(UserFeedback::getCreateTime));
 
         List<Long> userIds = page.getRecords().stream().map(UserFeedback::getUserId).filter(Objects::nonNull).distinct().toList();

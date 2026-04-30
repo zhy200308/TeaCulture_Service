@@ -99,20 +99,58 @@ async function openTopicModal(topicKey, id) {
 }
 
 function appendFavoriteBtn(container, targetType, targetId, targetKey) {
-    if (!TokenManager.getToken()) return;
     const btn = document.createElement('button');
-    btn.style.cssText = 'margin-top:15px;padding:8px 18px;background:#8b5a2b;color:#fff;border:none;border-radius:6px;cursor:pointer;';
-    btn.innerHTML = '<i class="fas fa-heart"></i> 收藏';
-    btn.onclick = async () => {
-        const result = await API.Favorite.add(targetType, targetId, targetKey);
-        if (result.code === 200) {
-            btn.innerHTML = '<i class="fas fa-check"></i> 已收藏';
-            btn.disabled = true;
+    btn.style.cssText = 'margin-top:15px;padding:8px 18px;border:1px solid #ddd;border-radius:6px;cursor:pointer;background:#fff;color:#8b5a2b;';
+    let isFavorite = false;
+
+    function render() {
+        const icon = isFavorite ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+        btn.innerHTML = `<i class="${icon}"></i> ${isFavorite ? '已收藏' : '收藏'}`;
+        if (isFavorite) {
+            btn.style.background = '#ff5252';
+            btn.style.borderColor = '#ff5252';
+            btn.style.color = '#fff';
         } else {
-            alert(result.message || '收藏失败');
+            btn.style.background = '#fff';
+            btn.style.borderColor = '#ddd';
+            btn.style.color = '#8b5a2b';
+        }
+    }
+
+    async function init() {
+        if (TokenManager.getToken()) {
+            const r = await API.Favorite.check(targetType, targetId);
+            if (r.code === 200) isFavorite = !!r.data?.isFavorite;
+        }
+        render();
+    }
+
+    btn.onclick = async () => {
+        if (!TokenManager.getToken()) {
+            alert('请先登录');
+            window.location.href = './login.html';
+            return;
+        }
+        if (isFavorite) {
+            const r = await API.Favorite.remove(targetType, targetId);
+            if (r.code === 200) {
+                isFavorite = false;
+                render();
+            } else {
+                alert(r.message || '取消收藏失败');
+            }
+        } else {
+            const r = await API.Favorite.add(targetType, targetId, targetKey);
+            if (r.code === 200) {
+                isFavorite = true;
+                render();
+            } else {
+                alert(r.message || '收藏失败');
+            }
         }
     };
     container.appendChild(btn);
+    init();
 }
 
 function closeModal() {

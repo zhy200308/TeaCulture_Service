@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理后台 - 茶文化服务平台</title>
+    <title>茶识管理 - 管理后台</title>
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/admin-common.css">
 </head>
 <body>
-
 <header>
     <div class="nav-container">
         <div class="logo">
@@ -17,7 +16,8 @@
         </div>
         <div class="nav-right">
             <span class="nav-user-text"><i class="fas fa-shield-alt"></i> <span id="adminUserText">管理员</span></span>
-            <a href="../index.html" class="nav-btn"><i class="fas fa-sign-out-alt"></i> 返回首页</a>
+            <a href="./admin.html" class="nav-btn"><i class="fas fa-gauge"></i> 控制台</a>
+            <a href="../index.html" class="nav-btn"><i class="fas fa-house"></i> 首页</a>
             <a href="./login.html" class="nav-btn" id="adminLogoutBtn"><i class="fas fa-right-from-bracket"></i> 退出</a>
         </div>
     </div>
@@ -28,40 +28,57 @@
         <div class="sidebar-menu">
             <div class="menu-title">管理菜单</div>
             <a class="menu-item" href="./admin-users.html"><i class="fas fa-users"></i><span>用户管理</span></a>
-            <a class="menu-item" href="./admin-knowledge.html"><i class="fas fa-book-open"></i><span>茶识管理</span></a>
+            <a class="menu-item active" href="./admin-knowledge.html"><i class="fas fa-book-open"></i><span>茶识管理</span></a>
             <a class="menu-item" href="./admin-topic.html"><i class="fas fa-layer-group"></i><span>专题管理</span></a>
             <a class="menu-item" href="./admin-scenario.html"><i class="fas fa-mug-hot"></i><span>场景管理</span></a>
             <a class="menu-item" href="./admin-tea-food.html"><i class="fas fa-utensils"></i><span>茶食搭配</span></a>
             <a class="menu-item" href="./admin-feedback.html"><i class="fas fa-comment-dots"></i><span>反馈管理</span></a>
             <a class="menu-item" href="./admin-favorites.html"><i class="fas fa-heart"></i><span>收藏管理</span></a>
             <a class="menu-item" href="./admin-device-commands.html"><i class="fas fa-microchip"></i><span>设备日志</span></a>
-            <div class="menu-title">基础数据</div>
-            <a class="menu-item" href="./admin-knowledge-categories.html"><i class="fas fa-tags"></i><span>茶识分类</span></a>
-            <a class="menu-item" href="./admin-topic-categories.html"><i class="fas fa-tag"></i><span>专题分类</span></a>
-            <a class="menu-item" href="./admin-wares.html"><i class="fas fa-cup"></i><span>茶器管理</span></a>
-            <a class="menu-item" href="./admin-brewing-params.html"><i class="fas fa-sliders"></i><span>冲泡参数</span></a>
-            <a class="menu-item" href="./admin-tea-type-params.html"><i class="fas fa-gears"></i><span>茶类参数</span></a>
         </div>
     </aside>
 
     <main class="admin-main">
-        <h2 class="page-title"><i class="fas fa-gauge"></i> 管理后台</h2>
-        <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
-            <div style="color:#666;line-height:1.8;">
-                请从左侧选择需要管理的模块。所有模块均支持分页、模糊搜索与批量删除；内容模块支持新增/编辑/删除。
-            </div>
+        <h2 class="page-title"><i class="fas fa-book-open"></i> 茶识管理</h2>
+
+        <div class="toolbar">
+            <input id="keyword" type="text" placeholder="标题/摘要 模糊搜索">
+            <select id="categoryCode">
+                <option value="">全部分类</option>
+            </select>
+            <button class="btn primary" id="searchBtn"><i class="fas fa-magnifying-glass"></i> 查询</button>
+            <button class="btn light" id="resetBtn"><i class="fas fa-rotate-left"></i> 重置</button>
+            <button class="btn primary" id="addBtn"><i class="fas fa-plus"></i> 新增</button>
+            <button class="btn danger" id="batchDeleteBtn"><i class="fas fa-trash"></i> 批量删除</button>
+        </div>
+
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th style="width:44px;"><input type="checkbox" id="checkAll"></th>
+                <th style="width:140px;">ID</th>
+                <th style="width:180px;">分类</th>
+                <th>标题</th>
+                <th style="width:90px;">状态</th>
+                <th style="width:220px;">操作</th>
+            </tr>
+            </thead>
+            <tbody id="tbody">
+            <tr><td colspan="6" align="center">加载中...</td></tr>
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <button class="btn light" id="prevBtn"><i class="fas fa-chevron-left"></i> 上一页</button>
+            <button class="btn light" id="nextBtn">下一页 <i class="fas fa-chevron-right"></i></button>
+            <span class="page-info" id="pageInfo"></span>
         </div>
     </main>
 </div>
 
 <script src="../assets/api.js"></script>
 <script src="../assets/admin-common.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        if (!AdminCommon.requireAdmin()) return;
-        AdminCommon.bindAdminHeader();
-    });
-</script>
-
+<script src="../assets/admin-knowledge.js"></script>
 </body>
 </html>
+
