@@ -84,9 +84,9 @@ public class AdminDeviceCommandController {
                 .setCommandType(log.getCommandType())
                 .setTopic(log.getTopic())
                 .setTeaType(log.getTeaType())
-                .setAmount(log.getAmount())
-                .setWaterTemp(log.getWaterTemp())
-                .setBrewTime(log.getBrewTime())
+                .setAmount(Integer.valueOf(log.getAmount()))
+                .setWaterTemp(Integer.valueOf(log.getWaterTemp()))
+                .setBrewTime(Integer.valueOf(log.getBrewTime()))
                 .setResult(log.getResult())
                 .setErrorMsg(log.getErrorMsg())
                 .setCreateTime(log.getCreateTime())).toList();
