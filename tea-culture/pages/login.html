@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>茶文化服务平台 - 登录</title>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft YaHei", sans-serif; }
+        body { background-color: #f9f7f4; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-box { width: 100%; max-width: 460px; background: #ffffff; border-radius: 14px; box-shadow: 0 2px 18px rgba(74, 124, 89, 0.12); padding: 50px 40px; }
+        .main-title { font-family: "KaiTi", "STKaiti", 楷体, serif; font-size: 30px; color: #3d684a; text-align: center; letter-spacing: 8px; font-weight: 500; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .main-title i { font-size: 26px; color: #4a7c59; }
+        .sub-title { text-align: center; color: #777; font-size: 15px; letter-spacing: 3px; margin-bottom: 40px; }
+        .form-item { margin-bottom: 26px; }
+        .form-item label { display: block; color: #444; font-size: 14px; margin-bottom: 8px; }
+        .input-group { position: relative; }
+        .input-group i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #4a7c59; font-size: 17px; }
+        .input-group input { width: 100%; height: 50px; border: 1px solid #e6e2db; border-radius: 8px; padding: 0 16px 0 48px; font-size: 15px; background: #fefdfa; outline: none; transition: 0.3s; }
+        .input-group input:focus { border-color: #4a7c59; box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.15); }
+        .role-group { display: flex; gap: 35px; margin-top: 10px; }
+        .role-group label { display: flex; align-items: center; gap: 6px; cursor: pointer; color: #555; }
+        .role-group input { accent-color: #4a7c59; }
+        .submit-btn { width: 100%; height: 52px; background-color: #4a7c59; color: #fff; border: none; border-radius: 8px; font-size: 16px; letter-spacing: 2px; cursor: pointer; transition: 0.3s; }
+        .submit-btn:hover { background-color: #3d684a; }
+        .toggle-box { text-align: center; margin-top: 28px; font-size: 14px; color: #666; letter-spacing: 1px; }
+        .toggle-box a { color: #4a7c59; text-decoration: none; font-weight: 500; cursor: pointer; }
+        .toggle-box a:hover { text-decoration: underline; }
+        #registerForm { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <!-- 登录表单 -->
+    <div id="loginForm">
+        <h2 class="main-title">
+            <i class="fas fa-leaf"></i>
+            茶文化服务平台
+        </h2>
+        <p class="sub-title"></p>
+
+        <div class="form-item">
+            <label>用户名</label>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" placeholder="请输入账号">
+            </div>
+        </div>
+
+        <div class="form-item">
+            <label>密码</label>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" placeholder="请输入密码">
+            </div>
+        </div>
+
+        <div class="form-item">
+            <label>登录角色</label>
+            <div class="role-group">
+                <label><input type="radio" name="role" value="user" checked> 普通用户</label>
+                <label><input type="radio" name="role" value="admin"> 管理员</label>
+            </div>
+        </div>
+
+        <button id="loginBtn" class="submit-btn">登 录</button>
+
+        <div class="toggle-box">
+            暂无账号？<a onclick="showRegister()">立即注册</a>
+        </div>
+    </div>
+
+    <!-- 注册表单 -->
+    <div id="registerForm">
+        <h2 class="main-title">
+            <i class="fas fa-leaf"></i>
+            账号注册
+        </h2>
+        <p class="sub-title">加入茶文化服务平台</p>
+
+        <div class="form-item">
+            <label>用户名</label>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" placeholder="请设置用户名">
+            </div>
+        </div>
+
+        <div class="form-item">
+            <label>密码</label>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" placeholder="请设置登录密码">
+            </div>
+        </div>
+
+        <div class="form-item">
+            <label>确认密码</label>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" placeholder="再次输入密码">
+            </div>
+        </div>
+
+        <div class="form-item">
+            <label>注册角色</label>
+            <div class="role-group">
+                <label><input type="radio" name="regRole" value="user" checked> 普通用户</label>
+                <label><input type="radio" name="regRole" value="admin"> 管理员</label>
+            </div>
+        </div>
+
+        <button id="registerBtn" class="submit-btn">注 册</button>
+
+        <div class="toggle-box">
+            已有账号？<a onclick="showLogin()">返回登录</a>
+        </div>
+    </div>
+</div>
+
+<script src="../assets/api.js"></script>
+<script src="../assets/login.js"></script>
+</body>
+</html>
