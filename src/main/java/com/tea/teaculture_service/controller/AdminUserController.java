@@ -9,6 +9,7 @@ import com.tea.teaculture_service.dto.common.IdListRequest;
 import com.tea.teaculture_service.entity.SysUser;
 import com.tea.teaculture_service.service.SysUserService;
 import com.tea.teaculture_service.utils.UserContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/admin/users")
 public class AdminUserController {
@@ -40,9 +42,12 @@ public class AdminUserController {
                                                                @RequestParam(required = false) Integer status,
                                                                @RequestParam(defaultValue = "1") Long pageNum,
                                                                @RequestParam(defaultValue = "20") Long pageSize) {
+        log.info("判断权限");
         if (!UserContext.isAdmin()) {
+            log.error("无权限");
             return ApiResponse.forbidden("无权限");
         }
+
         Page<SysUser> page = sysUserService.page(new Page<>(pageNum, pageSize),
                 new LambdaQueryWrapper<SysUser>()
                         .eq(SysUser::getDeleted, false)
@@ -50,7 +55,8 @@ public class AdminUserController {
                         .eq(status != null, SysUser::getStatus, status == 1)
                         .and(keyword != null && !keyword.isBlank(), w -> w.like(SysUser::getUsername, keyword).or().like(SysUser::getNickname, keyword))
                         .orderByDesc(SysUser::getCreateTime));
-
+        //打印获取到的数据
+        log.info("用户数据：{}",page);
         List<Map<String, Object>> records = page.getRecords().stream().map(u -> Map.<String, Object>of(
                 "id", u.getId(),
                 "username", u.getUsername(),

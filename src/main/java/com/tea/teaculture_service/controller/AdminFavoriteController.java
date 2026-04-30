@@ -90,12 +90,14 @@ public class AdminFavoriteController {
                 new LambdaQueryWrapper<UserFavorite>()
                         .eq(UserFavorite::getDeleted, false)
                         .eq(userId != null, UserFavorite::getUserId, userId)
-                        .in(userIds != null, UserFavorite::getUserId, userIds)
+                        .in(userIds != null && !userIds.isEmpty(), UserFavorite::getUserId, userIds)
                         .eq(targetType != null && !targetType.isBlank(), UserFavorite::getTargetType, targetType)
                         .orderByDesc(UserFavorite::getCreateTime));
 
         List<Long> pageUserIds = page.getRecords().stream().map(UserFavorite::getUserId).filter(Objects::nonNull).distinct().toList();
-        Map<Long, SysUser> userMap = sysUserService.listByIds(pageUserIds).stream()
+        Map<Long, SysUser> userMap = pageUserIds.isEmpty()
+                ? Collections.emptyMap()
+                : sysUserService.listByIds(pageUserIds).stream()
                 .collect(Collectors.toMap(SysUser::getId, Function.identity(), (a, b) -> a));
 
         Map<String, Map<Long, String>> titleMap = buildTitleMap(page.getRecords());

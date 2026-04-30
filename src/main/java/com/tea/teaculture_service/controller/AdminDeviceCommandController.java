@@ -67,13 +67,15 @@ public class AdminDeviceCommandController {
         Page<DeviceCommandLog> page = deviceCommandLogService.page(new Page<>(pageNum, pageSize),
                 new LambdaQueryWrapper<DeviceCommandLog>()
                         .eq(userId != null, DeviceCommandLog::getUserId, userId)
-                        .in(userIds != null, DeviceCommandLog::getUserId, userIds)
+                        .in(userIds != null && !userIds.isEmpty(), DeviceCommandLog::getUserId, userIds)
                         .eq(deviceId != null && !deviceId.isBlank(), DeviceCommandLog::getDeviceId, deviceId)
                         .eq(commandType != null && !commandType.isBlank(), DeviceCommandLog::getCommandType, commandType)
                         .orderByDesc(DeviceCommandLog::getCreateTime));
 
         List<Long> pageUserIds = page.getRecords().stream().map(DeviceCommandLog::getUserId).filter(Objects::nonNull).distinct().toList();
-        Map<Long, SysUser> userMap = sysUserService.listByIds(pageUserIds).stream()
+        Map<Long, SysUser> userMap = pageUserIds.isEmpty()
+                ? Map.of()
+                : sysUserService.listByIds(pageUserIds).stream()
                 .collect(Collectors.toMap(SysUser::getId, Function.identity(), (a, b) -> a));
 
         List<DeviceCommandAdminItem> items = page.getRecords().stream().map(log -> new DeviceCommandAdminItem()
@@ -84,9 +86,9 @@ public class AdminDeviceCommandController {
                 .setCommandType(log.getCommandType())
                 .setTopic(log.getTopic())
                 .setTeaType(log.getTeaType())
-                .setAmount(Integer.valueOf(log.getAmount()))
-                .setWaterTemp(Integer.valueOf(log.getWaterTemp()))
-                .setBrewTime(Integer.valueOf(log.getBrewTime()))
+                .setAmount(toInt(log.getAmount()))
+                .setWaterTemp(toInt(log.getWaterTemp()))
+                .setBrewTime(toInt(log.getBrewTime()))
                 .setResult(log.getResult())
                 .setErrorMsg(log.getErrorMsg())
                 .setCreateTime(log.getCreateTime())).toList();
@@ -97,6 +99,15 @@ public class AdminDeviceCommandController {
                 .setPageNum(pageNum)
                 .setPageSize(pageSize);
         return ApiResponse.ok(resp);
+    }
+
+    private static Integer toInt(String s) {
+        if (s == null || s.isBlank()) return null;
+        try {
+            return Integer.parseInt(s.trim());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -120,4 +131,3 @@ public class AdminDeviceCommandController {
         return ApiResponse.ok();
     }
 }
-
