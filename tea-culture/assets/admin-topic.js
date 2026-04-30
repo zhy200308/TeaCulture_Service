@@ -101,7 +101,7 @@ window.openEditor = async function (id, topicKey) {
     AdminCommon.openModal(id ? '编辑专题' : '新增专题', `
         <div class="form-grid">
             <div class="form-item">
-                <label>topicKey</label>
+                <label>内容标识（唯一）</label>
                 <input id="f_key" type="text" value="${escapeHtml(data.topicKey || '')}" ${id ? 'disabled' : ''}>
             </div>
             <div class="form-item">
@@ -114,11 +114,15 @@ window.openEditor = async function (id, topicKey) {
             </div>
             <div class="form-item">
                 <label>封面图</label>
-                <input id="f_cover" type="text" value="${escapeHtml(data.coverImage || '')}">
+                <input id="f_coverFile" type="file" accept="image/*">
+                <input id="f_cover" type="hidden" value="${escapeHtml(data.coverImage || '')}">
+                <img id="f_coverPreview" src="${escapeHtml(data.coverImage || '')}" style="margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
             </div>
             <div class="form-item">
-                <label>音频URL</label>
-                <input id="f_audio" type="text" value="${escapeHtml(data.audioUrl || '')}">
+                <label>音频文件（可选）</label>
+                <input id="f_audioFile" type="file" accept="audio/*">
+                <input id="f_audio" type="hidden" value="${escapeHtml(data.audioUrl || '')}">
+                <div style="margin-top:8px;color:#666;font-size:13px;word-break:break-all;" id="f_audioText">${escapeHtml(data.audioUrl || '')}</div>
             </div>
             <div class="form-item">
                 <label>状态</label>
@@ -132,23 +136,44 @@ window.openEditor = async function (id, topicKey) {
                 <textarea id="f_summary">${escapeHtml(data.summary || '')}</textarea>
             </div>
             <div class="form-item" style="grid-column:1/-1;">
-                <label>详情HTML</label>
+                <label>详情内容</label>
                 <textarea id="f_detail">${escapeHtml(data.detailContent || '')}</textarea>
             </div>
         </div>
     `, async () => {
+        let coverImage = document.getElementById('f_cover').value.trim();
+        const coverFile = document.getElementById('f_coverFile').files && document.getElementById('f_coverFile').files[0];
+        if (coverFile) {
+            const up = await API.Upload.uploadImage(coverFile);
+            if (up.code !== 200 || !up.data) {
+                alert(up.message || '封面上传失败');
+                return;
+            }
+            coverImage = up.data;
+        }
+
+        let audioUrl = document.getElementById('f_audio').value.trim();
+        const audioFile = document.getElementById('f_audioFile').files && document.getElementById('f_audioFile').files[0];
+        if (audioFile) {
+            const up = await API.Upload.uploadFile(audioFile);
+            if (up.code !== 200 || !up.data) {
+                alert(up.message || '音频上传失败');
+                return;
+            }
+            audioUrl = up.data;
+        }
         const payload = {
             topicKey: document.getElementById('f_key').value.trim(),
             topicCode: document.getElementById('f_code').value,
             title: document.getElementById('f_title').value.trim(),
-            coverImage: document.getElementById('f_cover').value.trim(),
-            audioUrl: document.getElementById('f_audio').value.trim(),
+            coverImage,
+            audioUrl,
             summary: document.getElementById('f_summary').value,
             detailContent: document.getElementById('f_detail').value,
             status: parseInt(document.getElementById('f_status').value, 10)
         };
         if (!id && !payload.topicKey) {
-            alert('topicKey不能为空');
+            alert('内容标识不能为空');
             return;
         }
         const r = id ? await API.Topic.update(id, payload) : await API.Topic.create(payload);
@@ -159,6 +184,23 @@ window.openEditor = async function (id, topicKey) {
             alert(r.message || '保存失败');
         }
     });
+
+    const coverFile = document.getElementById('f_coverFile');
+    const coverPreview = document.getElementById('f_coverPreview');
+    if (coverFile && coverPreview) {
+        coverFile.addEventListener('change', () => {
+            const file = coverFile.files && coverFile.files[0];
+            if (file) coverPreview.src = URL.createObjectURL(file);
+        });
+    }
+    const audioFile = document.getElementById('f_audioFile');
+    const audioText = document.getElementById('f_audioText');
+    if (audioFile && audioText) {
+        audioFile.addEventListener('change', () => {
+            const file = audioFile.files && audioFile.files[0];
+            if (file) audioText.innerText = file.name;
+        });
+    }
 
     const sel = document.getElementById('f_code');
     const categories = document.querySelectorAll('#topicCode option');

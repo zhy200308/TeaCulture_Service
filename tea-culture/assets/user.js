@@ -65,67 +65,121 @@ function showProfileModal() {
         <div class="user-modal-mask" onclick="closeUserModal(event)">
             <div class="user-modal" onclick="event.stopPropagation()">
                 <h3>个人资料修改</h3>
+                <h4>头像</h4>
+                <div class="form-item">
+                    <label>选择头像</label>
+                    <input type="file" id="avatarFile" accept="image/*">
+                </div>
+                <div class="form-item">
+                    <label>头像预览</label>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <img id="avatarPreview" src="${user.avatar || ''}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #eee;">
+                        <div style="color:#888;font-size:13px;">选择后可预览，不满意可重新选择</div>
+                    </div>
+                </div>
+                <div class="modal-btns" style="margin-top:10px;">
+                    <button onclick="closeUserModal()">取消</button>
+                    <button class="primary" onclick="saveAvatar()">保存头像</button>
+                </div>
+
+                <h4 style="margin-top:20px;">资料</h4>
                 <div class="form-item">
                     <label>昵称</label>
                     <input type="text" id="editNickname" value="${user.nickname || ''}" placeholder="请输入昵称">
                 </div>
                 <div class="form-item">
-                    <label>头像URL</label>
-                    <input type="text" id="editAvatar" value="${user.avatar || ''}" placeholder="请输入头像URL">
-                </div>
-                <div class="form-item">
                     <label>个人简介</label>
                     <textarea id="editDesc" rows="3" placeholder="一句话介绍自己">${user.description || ''}</textarea>
                 </div>
-                <h4 style="margin-top:20px;">修改密码（可选）</h4>
+                <div class="modal-btns" style="margin-top:10px;">
+                    <button class="primary" onclick="saveProfileBase()">保存资料</button>
+                </div>
+
+                <h4 style="margin-top:20px;">密码</h4>
                 <div class="form-item">
                     <label>原密码</label>
-                    <input type="password" id="oldPwd" placeholder="留空则不修改">
+                    <input type="password" id="oldPwd" placeholder="请输入原密码">
                 </div>
                 <div class="form-item">
                     <label>新密码</label>
                     <input type="password" id="newPwd" placeholder="至少6位">
                 </div>
                 <div class="modal-btns">
-                    <button onclick="closeUserModal()">取消</button>
-                    <button class="primary" onclick="saveProfile()">保存</button>
+                    <button class="primary" onclick="savePassword()">修改密码</button>
                 </div>
             </div>
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', html);
+    bindAvatarPreview();
 }
 
-window.saveProfile = async function () {
-    const nickname = document.getElementById('editNickname').value.trim();
-    const avatar = document.getElementById('editAvatar').value.trim();
-    const description = document.getElementById('editDesc').value.trim();
-    const oldPwd = document.getElementById('oldPwd').value;
-    const newPwd = document.getElementById('newPwd').value;
+function bindAvatarPreview() {
+    const input = document.getElementById('avatarFile');
+    const preview = document.getElementById('avatarPreview');
+    if (!input || !preview) return;
+    input.addEventListener('change', () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const url = URL.createObjectURL(file);
+        preview.src = url;
+    });
+}
 
-    // 资料保存
-    const r1 = await API.User.updateProfile({ nickname, avatar, description });
-    if (r1.code !== 200) {
-        alert(r1.message || '资料更新失败');
+window.saveAvatar = async function () {
+    const input = document.getElementById('avatarFile');
+    if (!input || !input.files || !input.files[0]) {
+        alert('请先选择头像文件');
         return;
     }
-
-    // 密码修改
-    if (oldPwd && newPwd) {
-        if (newPwd.length < 6) {
-            alert('新密码至少6位');
-            return;
-        }
-        const r2 = await API.User.changePassword(oldPwd, newPwd);
-        if (r2.code !== 200) {
-            alert(r2.message || '密码修改失败');
-            return;
-        }
+    const file = input.files[0];
+    const upload = await API.Upload.uploadImage(file);
+    if (upload.code !== 200 || !upload.data) {
+        alert(upload.message || '头像上传失败');
+        return;
     }
-
-    alert('保存成功');
-    closeUserModal();
+    const avatar = upload.data;
+    const r = await API.User.updateProfile({ avatar });
+    if (r.code !== 200) {
+        alert(r.message || '头像保存失败');
+        return;
+    }
+    alert('头像已更新');
     await loadUserProfile();
+    closeUserModal();
+};
+
+window.saveProfileBase = async function () {
+    const nickname = document.getElementById('editNickname').value.trim();
+    const description = document.getElementById('editDesc').value.trim();
+    const r = await API.User.updateProfile({ nickname, description });
+    if (r.code !== 200) {
+        alert(r.message || '资料保存失败');
+        return;
+    }
+    alert('资料已更新');
+    await loadUserProfile();
+    closeUserModal();
+};
+
+window.savePassword = async function () {
+    const oldPwd = document.getElementById('oldPwd').value;
+    const newPwd = document.getElementById('newPwd').value;
+    if (!oldPwd || !newPwd) {
+        alert('请输入原密码与新密码');
+        return;
+    }
+    if (newPwd.length < 6) {
+        alert('新密码至少6位');
+        return;
+    }
+    const r = await API.User.changePassword(oldPwd, newPwd);
+    if (r.code !== 200) {
+        alert(r.message || '密码修改失败');
+        return;
+    }
+    alert('密码已修改');
+    closeUserModal();
 };
 
 // ===== 我的收藏弹窗 =====
@@ -205,7 +259,7 @@ window.openFavoriteDetail = async function (targetType, targetKey, targetId) {
         const param = result.data.brewingParam || {};
         box.innerHTML = `
             <h4 style="margin:10px 0;color:#4a7c59;">${scenario.title || ''}</h4>
-            <div>${scenario.detailContent || ''}</div>
+            ${renderTextDetail(scenario.detailContent)}
             <div style="margin-top:15px;background:#f8f6f2;border-radius:10px;padding:12px;">
                 <div style="font-weight:600;color:#4a7c59;margin-bottom:8px;">推荐冲泡参数</div>
                 <div>茶类：${param.teaType || '—'}</div>
@@ -220,7 +274,7 @@ window.openFavoriteDetail = async function (targetType, targetKey, targetId) {
         const param = result.data.teaTypeParam || {};
         box.innerHTML = `
             <h4 style="margin:10px 0;color:#4a7c59;">${match.title || ''}</h4>
-            <div>${match.detailContent || ''}</div>
+            ${renderTextDetail(match.detailContent)}
             <div style="margin-top:15px;background:#f8f6f2;border-radius:10px;padding:12px;">
                 <div style="font-weight:600;color:#4a7c59;margin-bottom:8px;">智能茶器参数推荐</div>
                 <div>水温：${param.waterTemp || '—'}</div>
@@ -233,10 +287,20 @@ window.openFavoriteDetail = async function (targetType, targetKey, targetId) {
         const data = result.data;
         box.innerHTML = `
             <h4 style="margin:10px 0;color:#4a7c59;">${data.title || ''}</h4>
-            <div>${data.detailContent || ''}</div>
+            ${renderTextDetail(data.detailContent)}
         `;
     }
 };
+
+function renderTextDetail(text) {
+    const t = (text || '').trim();
+    if (!t) return '<p style="text-align:center;color:#999;padding:20px;">暂无详情</p>';
+    return `<div style="white-space:pre-wrap;line-height:1.8;">${escapeHtml(t)}</div>`;
+}
+
+function escapeHtml(str) {
+    return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
 // ===== 意见反馈弹窗 =====
 function showFeedbackModal() {

@@ -101,15 +101,15 @@ window.viewDetail = function (id) {
         <div style="color:#555;line-height:1.8;">
             <div><b>ID：</b>${item.id}</div>
             <div><b>用户：</b>${escapeHtml(item.username || '')} (${item.userId || ''})</div>
-            <div><b>deviceId：</b>${escapeHtml(item.deviceId || '')}</div>
-            <div><b>commandType：</b>${escapeHtml(item.commandType || '')}</div>
-            <div><b>topic：</b>${escapeHtml(item.topic || '')}</div>
-            <div><b>teaType：</b>${escapeHtml(item.teaType || '')}</div>
-            <div><b>amount：</b>${item.amount == null ? '' : item.amount}</div>
-            <div><b>waterTemp：</b>${item.waterTemp == null ? '' : item.waterTemp}</div>
-            <div><b>brewTime：</b>${item.brewTime == null ? '' : item.brewTime}</div>
-            <div><b>result：</b>${item.result == null ? '' : item.result}</div>
-            <div><b>errorMsg：</b>${escapeHtml(item.errorMsg || '')}</div>
+            <div><b>设备ID：</b>${escapeHtml(item.deviceId || '')}</div>
+            <div><b>指令类型：</b>${escapeHtml(item.commandType || '')}</div>
+            <div><b>主题：</b>${escapeHtml(item.topic || '')}</div>
+            <div><b>茶类：</b>${escapeHtml(item.teaType || '')}</div>
+            <div><b>投茶量：</b>${item.amount == null ? '' : item.amount}</div>
+            <div><b>水温：</b>${item.waterTemp == null ? '' : item.waterTemp}</div>
+            <div><b>冲泡时长：</b>${item.brewTime == null ? '' : item.brewTime}</div>
+            <div><b>结果：</b>${item.result == null ? '' : item.result}</div>
+            <div><b>错误信息：</b>${escapeHtml(item.errorMsg || '')}</div>
         </div>
     `, () => closeModal());
     const saveBtn = document.getElementById('modalSaveBtn');

@@ -94,7 +94,7 @@ async function openMatchModal(matchKey, id) {
     const param = result.data.teaTypeParam || {};
     currentTeaParam = param;
 
-    let html = match.detailContent || '';
+    let html = renderTextDetail(match.detailContent);
 
     // 拼接设备参数 + 同步按钮
     html += `
@@ -115,6 +115,16 @@ async function openMatchModal(matchKey, id) {
 
     bindSyncButton();
     appendFavoriteBtn(modalContent, 'food', id, matchKey);
+}
+
+function renderTextDetail(text) {
+    const t = (text || '').trim();
+    if (!t) return '<p style="text-align:center;color:#999;padding:20px;">暂无详情</p>';
+    return `<div style="white-space:pre-wrap;line-height:1.8;">${escapeHtml(t)}</div>`;
+}
+
+function escapeHtml(str) {
+    return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function bindSyncButton() {

@@ -37,18 +37,23 @@ const TokenManager = {
 // ===================== HTTP 请求封装 =====================
 async function request(url, options = {}) {
     const fullUrl = url.startsWith('http') ? url : API_BASE_URL + url;
-    const headers = {
-        'Content-Type': 'application/json',
-        ...options.headers
-    };
+    const headers = { ...(options.headers || {}) };
     const token = TokenManager.getToken();
     if (token) headers['Authorization'] = 'Bearer ' + token;
 
     try {
+        const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+        if (!isFormData && !headers['Content-Type']) {
+            headers['Content-Type'] = 'application/json';
+        }
         const response = await fetch(fullUrl, {
             ...options,
             headers,
-            body: options.body ? (typeof options.body === 'string' ? options.body : JSON.stringify(options.body)) : undefined
+            body: options.body
+                ? (isFormData
+                    ? options.body
+                    : (typeof options.body === 'string' ? options.body : JSON.stringify(options.body)))
+                : undefined
         });
 
         if (!response.ok && response.status !== 400) {
@@ -85,7 +90,8 @@ const http = {
     },
     post(url, body) { return request(url, { method: 'POST', body }); },
     put(url, body) { return request(url, { method: 'PUT', body }); },
-    delete(url) { return request(url, { method: 'DELETE' }); }
+    delete(url) { return request(url, { method: 'DELETE' }); },
+    upload(url, formData) { return request(url, { method: 'POST', body: formData }); }
 };
 
 // ===================== 1. 认证模块 =====================
@@ -673,6 +679,19 @@ const SearchAPI = {
     }
 };
 
+const UploadAPI = {
+    uploadImage(file) {
+        const fd = new FormData();
+        fd.append('file', file);
+        return http.upload('/upload/image', fd);
+    },
+    uploadFile(file) {
+        const fd = new FormData();
+        fd.append('file', file);
+        return http.upload('/upload/file', fd);
+    }
+};
+
 // ===================== 全局导出 =====================
 window.API = {
     Auth: AuthAPI,
@@ -692,6 +711,7 @@ window.API = {
     AdminTeaWare: AdminTeaWareAPI,
     AdminBrewingParam: AdminBrewingParamAPI,
     AdminTeaTypeParam: AdminTeaTypeParamAPI,
+    Upload: UploadAPI,
     Search: SearchAPI
 };
 window.TokenManager = TokenManager;

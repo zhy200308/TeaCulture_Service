@@ -88,19 +88,19 @@ window.openEditor = async function (id, matchKey) {
     AdminCommon.openModal(id ? '编辑茶食搭配' : '新增茶食搭配', `
         <div class="form-grid">
             <div class="form-item">
-                <label>matchKey</label>
+                <label>内容标识（唯一）</label>
                 <input id="f_key" type="text" value="${escapeHtml(data.matchKey || '')}" ${id ? 'disabled' : ''}>
             </div>
             <div class="form-item">
-                <label>teaTypeCode</label>
+                <label>茶类编码</label>
                 <input id="f_teaTypeCode" type="text" value="${escapeHtml(data.teaTypeCode || '')}">
             </div>
             <div class="form-item">
-                <label>teaName</label>
+                <label>茶名</label>
                 <input id="f_teaName" type="text" value="${escapeHtml(data.teaName || '')}">
             </div>
             <div class="form-item">
-                <label>foodName</label>
+                <label>食物名</label>
                 <input id="f_foodName" type="text" value="${escapeHtml(data.foodName || '')}">
             </div>
             <div class="form-item">
@@ -109,7 +109,9 @@ window.openEditor = async function (id, matchKey) {
             </div>
             <div class="form-item">
                 <label>封面图</label>
-                <input id="f_cover" type="text" value="${escapeHtml(data.coverImage || '')}">
+                <input id="f_coverFile" type="file" accept="image/*">
+                <input id="f_cover" type="hidden" value="${escapeHtml(data.coverImage || '')}">
+                <img id="f_coverPreview" src="${escapeHtml(data.coverImage || '')}" style="margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
             </div>
             <div class="form-item">
                 <label>状态</label>
@@ -127,25 +129,35 @@ window.openEditor = async function (id, matchKey) {
                 <textarea id="f_summary">${escapeHtml(data.summary || '')}</textarea>
             </div>
             <div class="form-item" style="grid-column:1/-1;">
-                <label>详情HTML</label>
+                <label>详情内容</label>
                 <textarea id="f_detail">${escapeHtml(data.detailContent || '')}</textarea>
             </div>
         </div>
     `, async () => {
+        let coverImage = document.getElementById('f_cover').value.trim();
+        const coverFile = document.getElementById('f_coverFile').files && document.getElementById('f_coverFile').files[0];
+        if (coverFile) {
+            const up = await API.Upload.uploadImage(coverFile);
+            if (up.code !== 200 || !up.data) {
+                alert(up.message || '封面上传失败');
+                return;
+            }
+            coverImage = up.data;
+        }
         const payload = {
             matchKey: document.getElementById('f_key').value.trim(),
             teaTypeCode: document.getElementById('f_teaTypeCode').value.trim(),
             teaName: document.getElementById('f_teaName').value.trim(),
             foodName: document.getElementById('f_foodName').value.trim(),
             title: document.getElementById('f_title').value.trim(),
-            coverImage: document.getElementById('f_cover').value.trim(),
+            coverImage,
             summary: document.getElementById('f_summary').value,
             detailContent: document.getElementById('f_detail').value,
             status: parseInt(document.getElementById('f_status').value, 10),
             sortOrder: document.getElementById('f_sort').value === '' ? null : parseInt(document.getElementById('f_sort').value, 10)
         };
         if (!id && !payload.matchKey) {
-            alert('matchKey不能为空');
+            alert('内容标识不能为空');
             return;
         }
         const r = id ? await API.TeaFood.update(id, payload) : await API.TeaFood.create(payload);
@@ -156,6 +168,15 @@ window.openEditor = async function (id, matchKey) {
             alert(r.message || '保存失败');
         }
     });
+
+    const coverFile = document.getElementById('f_coverFile');
+    const coverPreview = document.getElementById('f_coverPreview');
+    if (coverFile && coverPreview) {
+        coverFile.addEventListener('change', () => {
+            const file = coverFile.files && coverFile.files[0];
+            if (file) coverPreview.src = URL.createObjectURL(file);
+        });
+    }
 
     document.getElementById('f_status').value = String(data.status == null ? 1 : (data.status === true ? 1 : data.status));
 };

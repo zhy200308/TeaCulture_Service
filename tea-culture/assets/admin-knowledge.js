@@ -101,7 +101,7 @@ window.openEditor = async function (id, knowledgeKey) {
     AdminCommon.openModal(id ? '编辑茶识' : '新增茶识', `
         <div class="form-grid">
             <div class="form-item">
-                <label>knowledgeKey</label>
+                <label>内容标识（唯一）</label>
                 <input id="f_key" type="text" value="${escapeHtml(data.knowledgeKey || '')}" ${id ? 'disabled' : ''}>
             </div>
             <div class="form-item">
@@ -114,14 +114,16 @@ window.openEditor = async function (id, knowledgeKey) {
             </div>
             <div class="form-item">
                 <label>封面图</label>
-                <input id="f_cover" type="text" value="${escapeHtml(data.coverImage || '')}">
+                <input id="f_coverFile" type="file" accept="image/*">
+                <input id="f_cover" type="hidden" value="${escapeHtml(data.coverImage || '')}">
+                <img id="f_coverPreview" src="${escapeHtml(data.coverImage || '')}" style="margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
             </div>
             <div class="form-item" style="grid-column:1/-1;">
                 <label>摘要</label>
                 <textarea id="f_summary">${escapeHtml(data.summary || '')}</textarea>
             </div>
             <div class="form-item" style="grid-column:1/-1;">
-                <label>详情HTML</label>
+                <label>详情内容</label>
                 <textarea id="f_detail">${escapeHtml(data.detailContent || '')}</textarea>
             </div>
             <div class="form-item">
@@ -137,18 +139,28 @@ window.openEditor = async function (id, knowledgeKey) {
             </div>
         </div>
     `, async () => {
+        let coverImage = document.getElementById('f_cover').value.trim();
+        const coverFile = document.getElementById('f_coverFile').files && document.getElementById('f_coverFile').files[0];
+        if (coverFile) {
+            const up = await API.Upload.uploadImage(coverFile);
+            if (up.code !== 200 || !up.data) {
+                alert(up.message || '封面上传失败');
+                return;
+            }
+            coverImage = up.data;
+        }
         const payload = {
             knowledgeKey: document.getElementById('f_key').value.trim(),
             categoryCode: document.getElementById('f_category').value,
             title: document.getElementById('f_title').value.trim(),
-            coverImage: document.getElementById('f_cover').value.trim(),
+            coverImage,
             summary: document.getElementById('f_summary').value,
             detailContent: document.getElementById('f_detail').value,
             status: parseInt(document.getElementById('f_status').value, 10),
             sortOrder: document.getElementById('f_sort').value === '' ? null : parseInt(document.getElementById('f_sort').value, 10)
         };
         if (!id && !payload.knowledgeKey) {
-            alert('knowledgeKey不能为空');
+            alert('内容标识不能为空');
             return;
         }
         const r = id ? await API.Knowledge.update(id, payload) : await API.Knowledge.create(payload);
@@ -159,6 +171,15 @@ window.openEditor = async function (id, knowledgeKey) {
             alert(r.message || '保存失败');
         }
     });
+
+    const coverFile = document.getElementById('f_coverFile');
+    const coverPreview = document.getElementById('f_coverPreview');
+    if (coverFile && coverPreview) {
+        coverFile.addEventListener('change', () => {
+            const file = coverFile.files && coverFile.files[0];
+            if (file) coverPreview.src = URL.createObjectURL(file);
+        });
+    }
 
     const sel = document.getElementById('f_category');
     const categories = document.querySelectorAll('#categoryCode option');

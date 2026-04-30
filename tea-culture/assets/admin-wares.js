@@ -81,41 +81,53 @@ window.openEditor = function (id) {
     AdminCommon.openModal(id ? '编辑茶器' : '新增茶器', `
         <div class="form-grid">
             <div class="form-item">
-                <label>wareKey</label>
+                <label>茶器标识（唯一）</label>
                 <input id="f_key" type="text" value="${escapeHtml(data.wareKey || '')}">
             </div>
             <div class="form-item">
-                <label>name</label>
+                <label>茶器名称</label>
                 <input id="f_name" type="text" value="${escapeHtml(data.name || '')}">
             </div>
             <div class="form-item">
-                <label>image</label>
-                <input id="f_image" type="text" value="${escapeHtml(data.image || '')}">
+                <label>图片</label>
+                <input id="f_imageFile" type="file" accept="image/*">
+                <input id="f_image" type="hidden" value="${escapeHtml(data.image || '')}">
+                <img id="f_imagePreview" src="${escapeHtml(data.image || '')}" style="margin-top:8px;width:100%;max-width:260px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #eee;">
             </div>
             <div class="form-item">
-                <label>suitableTea</label>
+                <label>适用茶类</label>
                 <input id="f_suitable" type="text" value="${escapeHtml(data.suitableTea || '')}">
             </div>
             <div class="form-item">
-                <label>sortOrder</label>
+                <label>排序</label>
                 <input id="f_sort" type="number" value="${data.sortOrder == null ? '' : data.sortOrder}">
             </div>
             <div class="form-item" style="grid-column:1/-1;">
-                <label>detailContent</label>
+                <label>详情内容</label>
                 <textarea id="f_detail">${escapeHtml(data.detailContent || '')}</textarea>
             </div>
         </div>
     `, async () => {
+        let image = document.getElementById('f_image').value.trim();
+        const imageFile = document.getElementById('f_imageFile').files && document.getElementById('f_imageFile').files[0];
+        if (imageFile) {
+            const up = await API.Upload.uploadImage(imageFile);
+            if (up.code !== 200 || !up.data) {
+                alert(up.message || '图片上传失败');
+                return;
+            }
+            image = up.data;
+        }
         const payload = {
             wareKey: document.getElementById('f_key').value.trim(),
             name: document.getElementById('f_name').value.trim(),
-            image: document.getElementById('f_image').value.trim(),
+            image,
             suitableTea: document.getElementById('f_suitable').value.trim(),
             sortOrder: document.getElementById('f_sort').value === '' ? null : parseInt(document.getElementById('f_sort').value, 10),
             detailContent: document.getElementById('f_detail').value
         };
         if (!payload.wareKey) {
-            alert('wareKey不能为空');
+            alert('茶器标识不能为空');
             return;
         }
         const r = id ? await API.AdminTeaWare.update(id, payload) : await API.AdminTeaWare.create(payload);
@@ -126,6 +138,15 @@ window.openEditor = function (id) {
             alert(r.message || '保存失败');
         }
     });
+
+    const imageFile = document.getElementById('f_imageFile');
+    const imagePreview = document.getElementById('f_imagePreview');
+    if (imageFile && imagePreview) {
+        imageFile.addEventListener('change', () => {
+            const file = imageFile.files && imageFile.files[0];
+            if (file) imagePreview.src = URL.createObjectURL(file);
+        });
+    }
 };
 
 window.deleteRow = async function (id) {

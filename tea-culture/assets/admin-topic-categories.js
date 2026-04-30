@@ -80,15 +80,15 @@ window.openEditor = function (id) {
     AdminCommon.openModal(id ? '编辑分类' : '新增分类', `
         <div class="form-grid">
             <div class="form-item">
-                <label>topicCode</label>
+                <label>分类编码</label>
                 <input id="f_code" type="text" value="${escapeHtml(data.topicCode || '')}">
             </div>
             <div class="form-item">
-                <label>topicName</label>
+                <label>分类名称</label>
                 <input id="f_name" type="text" value="${escapeHtml(data.topicName || '')}">
             </div>
             <div class="form-item">
-                <label>sortOrder</label>
+                <label>排序</label>
                 <input id="f_sort" type="number" value="${data.sortOrder == null ? '' : data.sortOrder}">
             </div>
         </div>
@@ -99,7 +99,7 @@ window.openEditor = function (id) {
             sortOrder: document.getElementById('f_sort').value === '' ? null : parseInt(document.getElementById('f_sort').value, 10)
         };
         if (!payload.topicCode) {
-            alert('topicCode不能为空');
+            alert('分类编码不能为空');
             return;
         }
         const r = id ? await API.AdminTopicCategory.update(id, payload) : await API.AdminTopicCategory.create(payload);

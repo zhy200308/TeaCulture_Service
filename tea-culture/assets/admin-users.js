@@ -91,8 +91,8 @@ window.editUser = function (id, role, status) {
             <div class="form-item">
                 <label>角色</label>
                 <select id="editRole">
-                    <option value="user">user</option>
-                    <option value="admin">admin</option>
+                    <option value="user">普通用户</option>
+                    <option value="admin">管理员</option>
                 </select>
             </div>
             <div class="form-item">

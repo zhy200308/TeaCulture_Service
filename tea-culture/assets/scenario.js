@@ -97,7 +97,7 @@ async function openScenarioModal(scenarioKey, id) {
     const param = result.data.brewingParam || {};
     currentParams = param;
 
-    let html = scenario.detailContent || '';
+    let html = renderTextDetail(scenario.detailContent);
 
     // 拼接冲泡参数 + 同步按钮
     html += `
@@ -119,6 +119,16 @@ async function openScenarioModal(scenarioKey, id) {
 
     bindSyncButton();
     appendFavoriteBtn(modalContent, 'scenario', id, scenarioKey);
+}
+
+function renderTextDetail(text) {
+    const t = (text || '').trim();
+    if (!t) return '<p style="text-align:center;color:#999;padding:20px;">暂无详情</p>';
+    return `<div style="white-space:pre-wrap;line-height:1.8;">${escapeHtml(t)}</div>`;
+}
+
+function escapeHtml(str) {
+    return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 // ===== 绑定同步按钮 =====

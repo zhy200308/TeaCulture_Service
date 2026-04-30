@@ -116,7 +116,7 @@ async function showKnowledgeDetail(key, id) {
 
     const result = await API.Knowledge.getByKey(key);
     if (result.code === 200 && result.data) {
-        modalContent.innerHTML = result.data.detailContent || '<p>暂无详情</p>';
+        modalContent.innerHTML = renderTextDetail(result.data.detailContent);
         // 收藏按钮
         appendFavoriteBtn(modalContent, 'knowledge', id, key);
     } else {
@@ -133,10 +133,20 @@ async function showWareDetail(key) {
 
     const result = await API.Knowledge.getWareByKey(key);
     if (result.code === 200 && result.data) {
-        modalContent.innerHTML = result.data.detailContent || '<p>暂无详情</p>';
+        modalContent.innerHTML = renderTextDetail(result.data.detailContent);
     } else {
         modalContent.innerHTML = '<h3>内容加载失败</h3><p>请稍后重试</p>';
     }
+}
+
+function renderTextDetail(text) {
+    const t = (text || '').trim();
+    if (!t) return '<p style="text-align:center;color:#999;padding:20px;">暂无详情</p>';
+    return `<div style="white-space:pre-wrap;line-height:1.8;">${escapeHtml(t)}</div>`;
+}
+
+function escapeHtml(str) {
+    return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 // ===== 添加收藏按钮 =====

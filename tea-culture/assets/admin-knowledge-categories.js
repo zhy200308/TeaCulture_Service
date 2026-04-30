@@ -81,19 +81,19 @@ window.openEditor = function (id) {
     AdminCommon.openModal(id ? '编辑分类' : '新增分类', `
         <div class="form-grid">
             <div class="form-item">
-                <label>categoryCode</label>
+                <label>分类编码</label>
                 <input id="f_code" type="text" value="${escapeHtml(data.categoryCode || '')}">
             </div>
             <div class="form-item">
-                <label>categoryName</label>
+                <label>分类名称</label>
                 <input id="f_name" type="text" value="${escapeHtml(data.categoryName || '')}">
             </div>
             <div class="form-item">
-                <label>icon</label>
+                <label>图标（可选）</label>
                 <input id="f_icon" type="text" value="${escapeHtml(data.icon || '')}">
             </div>
             <div class="form-item">
-                <label>sortOrder</label>
+                <label>排序</label>
                 <input id="f_sort" type="number" value="${data.sortOrder == null ? '' : data.sortOrder}">
             </div>
         </div>
@@ -105,7 +105,7 @@ window.openEditor = function (id) {
             sortOrder: document.getElementById('f_sort').value === '' ? null : parseInt(document.getElementById('f_sort').value, 10)
         };
         if (!payload.categoryCode) {
-            alert('categoryCode不能为空');
+            alert('分类编码不能为空');
             return;
         }
         const r = id ? await API.AdminTeaCategory.update(id, payload) : await API.AdminTeaCategory.create(payload);

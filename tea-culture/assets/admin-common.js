@@ -23,6 +23,49 @@ function bindAdminHeader() {
             window.location.href = './login.html';
         });
     }
+
+    renderAdminSidebar();
+}
+
+function renderAdminSidebar() {
+    const box = document.getElementById('adminSidebar');
+    if (!box) return;
+    const current = (location.pathname.split('/').pop() || '').toLowerCase();
+
+    const sections = [
+        {
+            title: '管理菜单',
+            items: [
+                { href: 'admin-users.html', icon: 'fas fa-users', text: '用户管理' },
+                { href: 'admin-knowledge.html', icon: 'fas fa-book-open', text: '茶识管理' },
+                { href: 'admin-topic.html', icon: 'fas fa-layer-group', text: '专题管理' },
+                { href: 'admin-scenario.html', icon: 'fas fa-mug-hot', text: '场景管理' },
+                { href: 'admin-tea-food.html', icon: 'fas fa-utensils', text: '茶食搭配' },
+                { href: 'admin-feedback.html', icon: 'fas fa-comment-dots', text: '反馈管理' },
+                { href: 'admin-favorites.html', icon: 'fas fa-heart', text: '收藏管理' },
+                { href: 'admin-device-commands.html', icon: 'fas fa-microchip', text: '设备日志' }
+            ]
+        },
+        {
+            title: '基础数据',
+            items: [
+                { href: 'admin-knowledge-categories.html', icon: 'fas fa-tags', text: '茶识分类' },
+                { href: 'admin-topic-categories.html', icon: 'fas fa-tag', text: '专题分类' },
+                { href: 'admin-wares.html', icon: 'fas fa-cup', text: '茶器管理' },
+                { href: 'admin-brewing-params.html', icon: 'fas fa-sliders', text: '冲泡参数' },
+                { href: 'admin-tea-type-params.html', icon: 'fas fa-gears', text: '茶类参数' }
+            ]
+        }
+    ];
+
+    box.innerHTML = sections.map(s => `
+        <div class="menu-title">${s.title}</div>
+        ${s.items.map(i => `
+            <a class="menu-item ${current === i.href ? 'active' : ''}" href="./${i.href}">
+                <i class="${i.icon}"></i><span>${i.text}</span>
+            </a>
+        `).join('')}
+    `).join('');
 }
 
 function getQueryInt(name, defVal) {
@@ -79,5 +122,6 @@ window.AdminCommon = {
     getQueryInt,
     setQuery,
     openModal,
-    getCheckedIds
+    getCheckedIds,
+    renderAdminSidebar
 };

@@ -83,27 +83,27 @@ window.openEditor = function (id) {
     AdminCommon.openModal(id ? '编辑茶类参数' : '新增茶类参数', `
         <div class="form-grid">
             <div class="form-item">
-                <label>teaTypeCode</label>
+                <label>茶类编码</label>
                 <input id="f_code" type="text" value="${escapeHtml(data.teaTypeCode || '')}">
             </div>
             <div class="form-item">
-                <label>teaTypeName</label>
+                <label>茶类名称</label>
                 <input id="f_name" type="text" value="${escapeHtml(data.teaTypeName || '')}">
             </div>
             <div class="form-item">
-                <label>waterTemp</label>
+                <label>水温</label>
                 <input id="f_waterTemp" type="text" value="${escapeHtml(data.waterTemp || '')}">
             </div>
             <div class="form-item">
-                <label>amount</label>
+                <label>投茶量</label>
                 <input id="f_amount" type="text" value="${escapeHtml(data.amount || '')}">
             </div>
             <div class="form-item">
-                <label>brewTime</label>
+                <label>冲泡时长</label>
                 <input id="f_brewTime" type="text" value="${escapeHtml(data.brewTime || '')}">
             </div>
             <div class="form-item" style="grid-column:1/-1;">
-                <label>note</label>
+                <label>备注</label>
                 <textarea id="f_note">${escapeHtml(data.note || '')}</textarea>
             </div>
         </div>
@@ -117,7 +117,7 @@ window.openEditor = function (id) {
             note: document.getElementById('f_note').value
         };
         if (!payload.teaTypeCode) {
-            alert('teaTypeCode不能为空');
+            alert('茶类编码不能为空');
             return;
         }
         const r = id ? await API.AdminTeaTypeParam.update(id, payload) : await API.AdminTeaTypeParam.create(payload);
