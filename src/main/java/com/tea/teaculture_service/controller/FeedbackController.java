@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -91,7 +92,9 @@ public class FeedbackController {
                         .orderByDesc(UserFeedback::getCreateTime));
 
         List<Long> userIds = page.getRecords().stream().map(UserFeedback::getUserId).filter(Objects::nonNull).distinct().toList();
-        Map<Long, SysUser> userMap = sysUserService.listByIds(userIds).stream()
+        Map<Long, SysUser> userMap = userIds.isEmpty()
+                ? Collections.emptyMap()
+                : sysUserService.listByIds(userIds).stream()
                 .collect(Collectors.toMap(SysUser::getId, Function.identity(), (a, b) -> a));
 
         List<FeedbackAdminItem> items = page.getRecords().stream().map(f -> new FeedbackAdminItem()
