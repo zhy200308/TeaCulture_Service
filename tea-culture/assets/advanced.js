@@ -69,7 +69,7 @@ async function loadTopicList() {
     list.innerHTML = records.map(item => `
         <div class="topic-card" data-topic="${item.topicCode}">
             <div class="topic-card-img">
-                <img src="${item.coverImage || ''}" alt="${item.title}">
+                ${renderTopicCardImage(item)}
             </div>
             <div class="topic-card-content">
                 <span class="topic-tag">${item.topicName || ''}</span>
@@ -90,7 +90,7 @@ async function openTopicModal(id) {
 
     const result = await API.Topic.getById(id);
     if (result.code === 200 && result.data) {
-        modalContent.innerHTML = renderTextDetail(result.data.detailContent);
+        modalContent.innerHTML = renderTopicDetail(result.data);
         // 添加收藏按钮
         appendFavoriteBtn(modalContent, 'topic', id);
     } else {
@@ -98,14 +98,120 @@ async function openTopicModal(id) {
     }
 }
 
-function renderTextDetail(text) {
-    const t = (text || '').trim();
-    if (!t) return '<p style="text-align:center;color:#999;padding:20px;">暂无详情</p>';
-    return `<div style="white-space:pre-wrap;line-height:1.8;">${escapeHtml(t)}</div>`;
+function renderTopicDetail(data) {
+    const title = escapeHtml(data?.title || '');
+    const imgUrl = normalizeImageUrl(data?.coverImage) || getTopicFallbackImage(title);
+    const img = imgUrl ? `<img src="${imgUrl}" alt="${title}" onerror="this.style.display='none'">` : '';
+
+    const audioUrl = normalizeImageUrl(data?.audioUrl) || (title.includes('陈皮普洱') ? '../images/3.5.m4a' : '');
+    const audioHtml = audioUrl ? `<div class="audio-player"><audio controls src="${audioUrl}"></audio></div>` : '';
+
+    const { sections, tip, classic } = parseTopicContent(String(data?.detailContent || ''));
+    const classicTitle = classic ? resolveClassicTitle(classic) : '';
+    const classicHtml = classic ? `<div class="classic-text"><h4>${escapeHtml(classicTitle)}</h4><p>${escapeHtml(classic)}</p></div>` : '';
+
+    const sectionHtml = sections.map(s => `
+        <div class="topic-section">
+            <h4>${escapeHtml(s.title)}</h4>
+            ${s.paragraphs.map(p => `<p>${escapeHtml(p)}</p>`).join('')}
+        </div>
+    `).join('');
+
+    const tipHtml = tip ? `<div class="tips-box"><h4>小贴士</h4><p>${escapeHtml(tip)}</p></div>` : '';
+
+    return `
+        <h3>${title}</h3>
+        ${img}
+        ${sectionHtml}
+        ${classicHtml}
+        ${audioHtml}
+        ${tipHtml}
+    `;
+}
+
+function parseTopicContent(text) {
+    const src = (text || '').trim();
+    if (!src) return { sections: [], tip: '', classic: '' };
+
+    const lines = src.replace(/\r\n/g, '\n').split('\n').map(s => s.trim()).filter(Boolean);
+    const sections = [];
+    let tip = '';
+    let classic = '';
+    let current = null;
+
+    const pushCurrent = () => {
+        if (current && current.paragraphs.length) sections.push(current);
+        current = null;
+    };
+
+    lines.forEach(line => {
+        const m = line.match(/^([^：]{2,20})[:：]\s*(.*)$/);
+        if (m) {
+            const key = m[1].trim();
+            const rest = (m[2] || '').trim();
+            if (key.includes('小贴士')) {
+                pushCurrent();
+                tip = rest || '';
+                return;
+            }
+            if (key.includes('典籍选读')) {
+                pushCurrent();
+                classic = rest.replace(/^《/, '《');
+                return;
+            }
+            pushCurrent();
+            current = { title: key, paragraphs: [] };
+            if (rest) current.paragraphs.push(rest);
+            return;
+        }
+
+        if (!current) current = { title: '内容', paragraphs: [] };
+        current.paragraphs.push(line);
+    });
+
+    pushCurrent();
+    return { sections, tip, classic };
 }
 
 function escapeHtml(str) {
     return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function normalizeImageUrl(url) {
+    const u = String(url || '').trim();
+    if (!u) return '';
+    if (u.startsWith('./images/')) return `../images/${u.slice('./images/'.length)}`;
+    if (u.startsWith('/images/')) return `..${u}`;
+    return u;
+}
+
+function getTopicFallbackImage(title) {
+    const t = String(title || '');
+    if (t.includes('普洱茶熟茶发酵工艺')) return '../images/3.png';
+    if (t.includes('西湖龙井核心产区')) return '../images/3.1.png';
+    if (t.includes('乌龙茶香气品鉴技巧')) return '../images/3.2.png';
+    if (t.includes('白茶自然萎凋工艺')) return '../images/3.3.png';
+    if (t.includes('陈皮普洱')) return '../images/3.4.jpg';
+    if (t.includes('唐宋茶器')) return '../images/3.6.png';
+    return '';
+}
+
+function resolveTopicImage(item) {
+    const cover = normalizeImageUrl(item?.coverImage);
+    if (cover) return cover;
+    return getTopicFallbackImage(item?.title || '');
+}
+
+function renderTopicCardImage(item) {
+    const url = resolveTopicImage(item);
+    if (!url) return '';
+    return `<img src="${url}" alt="${escapeHtml(item?.title || '')}" onerror="this.style.display='none'">`;
+}
+
+function resolveClassicTitle(text) {
+    const m = String(text || '').match(/(《[^》]{1,30}》)/);
+    if (m) return `典籍选读 · ${m[1]}`;
+    return '典籍选读';
 }
 
 function appendFavoriteBtn(container, targetType, targetId) {

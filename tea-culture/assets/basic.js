@@ -101,7 +101,7 @@ async function loadWares() {
 
     list.innerHTML = (result.data || []).map(w => `
         <div class="teaware-card" onclick="showWareDetail(${w.id})">
-            <img src="${w.image || ''}" alt="${w.name}">
+            <img src="${normalizeImageUrl(w.image) || ''}" alt="${w.name}">
             <div class="teaware-name">${w.name}</div>
         </div>
     `).join('');
@@ -116,7 +116,7 @@ async function showKnowledgeDetail(id) {
 
     const result = await API.Knowledge.getById(id);
     if (result.code === 200 && result.data) {
-        modalContent.innerHTML = renderTextDetail(result.data.detailContent);
+        modalContent.innerHTML = renderKnowledgeDetail(result.data);
         // 收藏按钮
         appendFavoriteBtn(modalContent, 'knowledge', id);
     } else {
@@ -133,16 +133,67 @@ async function showWareDetail(id) {
 
     const result = await API.Knowledge.getWareById(id);
     if (result.code === 200 && result.data) {
-        modalContent.innerHTML = renderTextDetail(result.data.detailContent);
+        modalContent.innerHTML = renderWareDetail(result.data);
     } else {
         modalContent.innerHTML = '<h3>内容加载失败</h3><p>请稍后重试</p>';
     }
 }
 
+function renderKnowledgeDetail(data) {
+    const title = escapeHtml(data?.title || '');
+    const imgUrl = normalizeImageUrl(data?.coverImage) || getKnowledgeFallbackImage(title);
+    const img = imgUrl ? `<img src="${imgUrl}" alt="${title}" onerror="this.style.display='none'">` : '';
+    return `
+        <h3>${title}</h3>
+        ${img}
+        ${renderTextDetail(data?.detailContent)}
+    `;
+}
+
+function renderWareDetail(data) {
+    const title = escapeHtml(data?.name || '');
+    const imgUrl = normalizeImageUrl(data?.image) || getWareFallbackImage(title);
+    const img = imgUrl ? `<img src="${imgUrl}" alt="${title}" onerror="this.style.display='none'">` : '';
+    return `
+        <h3>${title}</h3>
+        ${img}
+        ${renderTextDetail(data?.detailContent)}
+    `;
+}
+
 function renderTextDetail(text) {
     const t = (text || '').trim();
     if (!t) return '<p style="text-align:center;color:#999;padding:20px;">暂无详情</p>';
-    return `<div style="white-space:pre-wrap;line-height:1.8;">${escapeHtml(t)}</div>`;
+    const lines = t.split('\n').map(s => s.trim()).filter(Boolean);
+    return lines.map(line => `<p>${escapeHtml(line)}</p>`).join('');
+}
+
+function normalizeImageUrl(url) {
+    const u = String(url || '').trim();
+    if (!u) return '';
+    if (u.startsWith('./images/')) return `../images/${u.slice('./images/'.length)}`;
+    if (u.startsWith('/images/')) return `..${u}`;
+    return u;
+}
+
+function getKnowledgeFallbackImage(title) {
+    const t = String(title || '');
+    if (t.includes('六大茶类')) return '../images/2.4.jpg';
+    if (t.includes('绿茶') && (t.includes('水温') || t.includes('冲泡'))) return '../images/2.5.jpg';
+    if (t.includes('盖碗')) return '../images/2.6.jpg';
+    if (t.includes('养生')) return '../images/2.7.jpg';
+    if (t.includes('简史')) return '../images/2.8.png';
+    if (t.includes('叩指礼')) return '../images/2.9.png';
+    if (t.includes('六君子')) return '../images/2.10.png';
+    return '';
+}
+
+function getWareFallbackImage(title) {
+    const t = String(title || '');
+    if (t.includes('紫砂壶')) return '../images/2.1.jpg';
+    if (t.includes('白瓷盖碗')) return '../images/2.jpg';
+    if (t.includes('玻璃杯')) return '../images/2.3.png';
+    return '';
 }
 
 function escapeHtml(str) {

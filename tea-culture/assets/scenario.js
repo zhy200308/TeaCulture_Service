@@ -201,7 +201,18 @@ function bindSyncButton() {
     const syncStatus = document.getElementById('syncStatus');
     if (!syncBtn || !currentParams) return;
 
-    syncBtn.addEventListener('click', async () => {
+    if (window.DataValidator) {
+        const validation = DataValidator.validateBrewParams(currentParams);
+        if (!validation.isValid) {
+            syncStatus.innerHTML = '参数配置异常';
+            return;
+        }
+    }
+
+    const newBtn = syncBtn.cloneNode(true);
+    syncBtn.parentNode.replaceChild(newBtn, syncBtn);
+
+    newBtn.addEventListener('click', async () => {
         if (!window.mqttManager || !mqttManager.isConnected()) {
             syncStatus.innerHTML = '设备离线，无法同步';
             return;
@@ -217,11 +228,19 @@ function bindSyncButton() {
             timestamp: Date.now()
         };
 
+        if (window.DataValidator) {
+            const msgValidation = DataValidator.validateMqttMessage(command);
+            if (!msgValidation.isValid) {
+                syncStatus.innerHTML = '消息格式错误';
+                return;
+            }
+        }
+
         syncStatus.innerHTML = '指令发送中...';
-        syncBtn.disabled = true;
+        newBtn.disabled = true;
 
         mqttManager.publish(mqttManager.brewTopic, command, 1, async (err) => {
-            syncBtn.disabled = false;
+            newBtn.disabled = false;
             if (err) {
                 syncStatus.innerHTML = '指令发送失败';
                 // 上报失败日志
