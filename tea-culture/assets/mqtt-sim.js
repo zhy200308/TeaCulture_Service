@@ -84,10 +84,7 @@ const mqttManager = (function() {
     function getClient() {
         return client;
     }
-
-    // 启动连接
     connect();
-
     return {
         onStatusChange,
         publish,
@@ -96,3 +93,4 @@ const mqttManager = (function() {
         brewTopic: config.brewTopic
     };
 })();
+window.mqttManager = mqttManager;

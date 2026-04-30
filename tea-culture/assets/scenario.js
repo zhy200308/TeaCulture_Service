@@ -19,6 +19,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.mqttManager) {
         mqttManager.onStatusChange(updateDeviceStatusUI);
     }
+// 1. 看回调有没有注册上
+    mqttManager.onStatusChange(c => console.log('回调收到:', c));
+
+// 2. 手动触发一次 UI 更新
+    document.getElementById('deviceStatusText').innerText = '在线';
 
     window.addEventListener('click', (e) => {
         if (e.target === document.getElementById('detailModal')) {
@@ -213,6 +218,8 @@ function bindSyncButton() {
     syncBtn.parentNode.replaceChild(newBtn, syncBtn);
 
     newBtn.addEventListener('click', async () => {
+        console.log("当前的连接状态",mqttManager.isConnected())
+        console.log("window的状态",window.mqttManager)
         if (!window.mqttManager || !mqttManager.isConnected()) {
             syncStatus.innerHTML = '设备离线，无法同步';
             return;
