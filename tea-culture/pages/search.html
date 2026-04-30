@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全站搜索 - 茶文化服务平台</title>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/main.css">
+    <link rel="stylesheet" href="../assets/site-header.css">
+    <link rel="stylesheet" href="../assets/search.css">
+</head>
+<body>
+<header id="siteHeader"></header>
+
+<div class="search-wrap">
+    <div class="search-head">
+        <h2><i class="fas fa-magnifying-glass"></i> 全站搜索</h2>
+        <div class="search-input-box">
+            <i class="fas fa-search"></i>
+            <input id="pageSearchInput" type="text" placeholder="输入关键词，回车搜索（支持多关键词）">
+        </div>
+    </div>
+    <div style="color:#777;font-size:13px;" id="searchTip"></div>
+
+    <div class="result-section" id="secKnowledge"></div>
+    <div class="result-section" id="secTopic"></div>
+    <div class="result-section" id="secScenario"></div>
+    <div class="result-section" id="secFood"></div>
+</div>
+
+<script src="../assets/api.js"></script>
+<script src="../assets/site-header.js"></script>
+<script src="../assets/search.js"></script>
+</body>
+</html>

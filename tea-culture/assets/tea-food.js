@@ -14,21 +14,20 @@ let allMatches = [];
 let teaTypeNameMap = {};
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const sp = new URLSearchParams(location.search);
     await initTeaFood();
 
     if (window.mqttManager) {
         mqttManager.onStatusChange(updateDeviceStatusUI);
     }
-// 1. 看回调有没有注册上
-    mqttManager.onStatusChange(c => console.log('回调收到:', c));
-
-// 2. 手动触发一次 UI 更新
-    document.getElementById('deviceStatusText').innerText = '在线';
     window.addEventListener('click', (e) => {
         if (e.target === document.getElementById('detailModal')) {
             closeModal();
         }
     });
+
+    const openId = sp.get('openId');
+    if (openId) showMatchDetail(parseInt(openId, 10));
 });
 
 async function initTeaFood() {

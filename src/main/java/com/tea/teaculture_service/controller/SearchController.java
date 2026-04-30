@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Arrays;
 
 @RestController
 @RequestMapping("/search")
@@ -48,31 +49,61 @@ public class SearchController {
                     .setFoodMatches(Collections.emptyList()));
         }
 
+        List<String> terms = Arrays.stream(keyword.trim().split("[\\s,，;；|]+"))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .limit(8)
+                .toList();
+
         List<TeaKnowledge> knowledge = teaKnowledgeService.list(new LambdaQueryWrapper<TeaKnowledge>()
                 .eq(TeaKnowledge::getDeleted, false)
                 .eq(TeaKnowledge::getStatus, true)
-                .and(w -> w.like(TeaKnowledge::getTitle, keyword).or().like(TeaKnowledge::getSummary, keyword))
+                .and(w -> {
+                    for (int i = 0; i < terms.size(); i++) {
+                        String t = terms.get(i);
+                        if (i == 0) w.like(TeaKnowledge::getTitle, t).or().like(TeaKnowledge::getSummary, t);
+                        else w.or().like(TeaKnowledge::getTitle, t).or().like(TeaKnowledge::getSummary, t);
+                    }
+                })
                 .orderByDesc(TeaKnowledge::getUpdateTime)
                 .last("limit 20"));
 
         List<TeaTopic> topics = teaTopicService.list(new LambdaQueryWrapper<TeaTopic>()
                 .eq(TeaTopic::getDeleted, false)
                 .eq(TeaTopic::getStatus, true)
-                .and(w -> w.like(TeaTopic::getTitle, keyword).or().like(TeaTopic::getSummary, keyword))
+                .and(w -> {
+                    for (int i = 0; i < terms.size(); i++) {
+                        String t = terms.get(i);
+                        if (i == 0) w.like(TeaTopic::getTitle, t).or().like(TeaTopic::getSummary, t);
+                        else w.or().like(TeaTopic::getTitle, t).or().like(TeaTopic::getSummary, t);
+                    }
+                })
                 .orderByDesc(TeaTopic::getUpdateTime)
                 .last("limit 20"));
 
         List<TeaScenario> scenarios = teaScenarioService.list(new LambdaQueryWrapper<TeaScenario>()
                 .eq(TeaScenario::getDeleted, false)
                 .eq(TeaScenario::getStatus, true)
-                .and(w -> w.like(TeaScenario::getTitle, keyword).or().like(TeaScenario::getSummary, keyword))
+                .and(w -> {
+                    for (int i = 0; i < terms.size(); i++) {
+                        String t = terms.get(i);
+                        if (i == 0) w.like(TeaScenario::getTitle, t).or().like(TeaScenario::getSummary, t);
+                        else w.or().like(TeaScenario::getTitle, t).or().like(TeaScenario::getSummary, t);
+                    }
+                })
                 .orderByDesc(TeaScenario::getUpdateTime)
                 .last("limit 20"));
 
         List<TeaFoodMatch> foodMatches = teaFoodMatchService.list(new LambdaQueryWrapper<TeaFoodMatch>()
                 .eq(TeaFoodMatch::getDeleted, false)
                 .eq(TeaFoodMatch::getStatus, true)
-                .and(w -> w.like(TeaFoodMatch::getTitle, keyword).or().like(TeaFoodMatch::getSummary, keyword))
+                .and(w -> {
+                    for (int i = 0; i < terms.size(); i++) {
+                        String t = terms.get(i);
+                        if (i == 0) w.like(TeaFoodMatch::getTitle, t).or().like(TeaFoodMatch::getSummary, t);
+                        else w.or().like(TeaFoodMatch::getTitle, t).or().like(TeaFoodMatch::getSummary, t);
+                    }
+                })
                 .orderByDesc(TeaFoodMatch::getUpdateTime)
                 .last("limit 20"));
 
@@ -83,4 +114,3 @@ public class SearchController {
                 .setFoodMatches(foodMatches));
     }
 }
-

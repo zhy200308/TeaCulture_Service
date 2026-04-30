@@ -10,8 +10,12 @@
 
 let currentScenarioType = 'all';
 let currentParams = null;
+let currentKeyword = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const sp = new URLSearchParams(location.search);
+    currentKeyword = (sp.get('keyword') || '').trim();
+
     await loadScenarioList();
     bindTabEvents();
 
@@ -19,17 +23,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.mqttManager) {
         mqttManager.onStatusChange(updateDeviceStatusUI);
     }
-// 1. 看回调有没有注册上
-    mqttManager.onStatusChange(c => console.log('回调收到:', c));
-
-// 2. 手动触发一次 UI 更新
-    document.getElementById('deviceStatusText').innerText = '在线';
 
     window.addEventListener('click', (e) => {
         if (e.target === document.getElementById('detailModal')) {
             closeModal();
         }
     });
+
+    const openId = sp.get('openId');
+    if (openId) openScenarioModal(parseInt(openId, 10));
 });
 
 // ===== 绑定 Tab 切换 =====
@@ -54,6 +56,7 @@ async function loadScenarioList() {
     if (currentScenarioType && currentScenarioType !== 'all') {
         params.scenarioType = currentScenarioType;
     }
+    if (currentKeyword) params.keyword = currentKeyword;
 
     const result = await API.Scenario.list(params);
     if (result.code !== 200) {

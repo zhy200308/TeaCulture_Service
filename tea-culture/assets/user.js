@@ -33,16 +33,30 @@ async function loadUserProfile() {
     }
     const user = result.data;
     TokenManager.setUserInfo(user);
+    if (window.renderSiteHeader) window.renderSiteHeader();
 
     const nameEl = document.querySelector('.user-name');
     const descEl = document.querySelector('.user-desc');
     const tagEl = document.querySelector('.user-tag');
-    const navUserEl = document.querySelector('.nav-user-text');
+    const avatarBox = document.getElementById('profileAvatarBox');
 
     if (nameEl) nameEl.innerText = user.nickname || user.username;
     if (descEl) descEl.innerText = user.description || '热爱茶文化，静心品茶，乐享生活';
     if (tagEl) tagEl.innerText = (user.tag || '普通会员') + ' · 茶文化爱好者';
-    if (navUserEl) navUserEl.innerHTML = `<i class="fas fa-user-circle"></i> 欢迎你，${user.nickname || user.username}`;
+    if (avatarBox) {
+        const url = normalizeImageUrl(user.avatar);
+        avatarBox.innerHTML = url
+            ? `<img src="${url}" alt="" onerror="this.style.display='none'">`
+            : `<i class="fas fa-user-circle"></i>`;
+    }
+}
+
+function normalizeImageUrl(url) {
+    const u = String(url || '').trim();
+    if (!u) return '';
+    if (u.startsWith('./images/')) return `../images/${u.slice('./images/'.length)}`;
+    if (u.startsWith('/images/')) return `..${u}`;
+    return u;
 }
 
 // ===== 绑定菜单事件 =====

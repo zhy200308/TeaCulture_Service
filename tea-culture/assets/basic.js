@@ -10,8 +10,12 @@
  */
 
 let currentCategory = 'all';
+let currentKeyword = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const sp = new URLSearchParams(location.search);
+    currentKeyword = (sp.get('keyword') || '').trim();
+
     await loadCategories();
     await loadKnowledgeList();
     await loadWares();
@@ -22,6 +26,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             closeModal();
         }
     });
+
+    const openId = sp.get('openId');
+    if (openId) showKnowledgeDetail(parseInt(openId, 10));
 });
 
 // ===== 加载分类 =====
@@ -69,6 +76,7 @@ async function loadKnowledgeList() {
     if (currentCategory && currentCategory !== 'all') {
         params.categoryCode = currentCategory;
     }
+    if (currentKeyword) params.keyword = currentKeyword;
 
     const result = await API.Knowledge.list(params);
     if (result.code !== 200) {

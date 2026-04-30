@@ -91,6 +91,7 @@ function escapeHtml(str) {
 }
 
 document.addEventListener('DOMContentLoaded', renderSiteHeader);
+window.renderSiteHeader = renderSiteHeader;
 
 function normalizeImageUrl(url) {
     const u = String(url || '').trim();

@@ -1,0 +1,115 @@
+ .search-wrap {
+     max-width: 1200px;
+     margin: 24px auto 50px;
+     padding: 0 20px;
+ }
+ 
+ .search-head {
+     display: flex;
+     gap: 12px;
+     align-items: center;
+     justify-content: space-between;
+     margin-bottom: 18px;
+ }
+ 
+ .search-head h2 {
+     font-size: 22px;
+     color: #333;
+     margin: 0;
+ }
+ 
+ .search-input-box {
+     flex: 1;
+     max-width: 520px;
+     position: relative;
+ }
+ 
+ .search-input-box input {
+     width: 100%;
+     padding: 10px 14px 10px 38px;
+     border: 1px solid #e0d8cf;
+     border-radius: 999px;
+     background: #fff;
+     outline: none;
+     font-size: 14px;
+ }
+ 
+ .search-input-box i {
+     position: absolute;
+     left: 14px;
+     top: 50%;
+     transform: translateY(-50%);
+     color: #8b5a2b;
+ }
+ 
+ .result-section {
+     margin-top: 18px;
+     background: #fff;
+     border-radius: 14px;
+     padding: 16px;
+     box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+ }
+ 
+ .result-section h3 {
+     margin: 0 0 12px;
+     font-size: 16px;
+     color: #333;
+     display: flex;
+     align-items: center;
+     gap: 10px;
+ }
+ 
+ .result-count {
+     font-size: 12px;
+     color: #888;
+     background: #f8f6f2;
+     padding: 2px 8px;
+     border-radius: 999px;
+ }
+ 
+ .result-list {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+     gap: 12px;
+ }
+ 
+ .result-item {
+     border: 1px solid #f0e6d8;
+     border-radius: 12px;
+     padding: 12px;
+     cursor: pointer;
+     transition: all .2s;
+     background: #fff;
+ }
+ 
+ .result-item:hover {
+     transform: translateY(-2px);
+     box-shadow: 0 6px 16px rgba(0,0,0,.08);
+ }
+ 
+ .result-title {
+     font-weight: 700;
+     color: #333;
+     line-height: 1.4;
+     margin-bottom: 6px;
+ }
+ 
+ .result-summary {
+     color: #666;
+     font-size: 13px;
+     line-height: 1.6;
+     height: 42px;
+     overflow: hidden;
+ }
+ 
+ .result-tag {
+     margin-top: 10px;
+     display: inline-flex;
+     align-items: center;
+     gap: 6px;
+     background: #f0e6d8;
+     color: #8b5a2b;
+     padding: 3px 10px;
+     border-radius: 999px;
+     font-size: 12px;
+ }

@@ -8,8 +8,12 @@
  */
 
 let currentTopicCode = 'all';
+let currentKeyword = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const sp = new URLSearchParams(location.search);
+    currentKeyword = (sp.get('keyword') || '').trim();
+
     await loadTopicCategories();
     await loadTopicList();
 
@@ -18,6 +22,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             closeModal();
         }
     });
+
+    const openId = sp.get('openId');
+    if (openId) openTopicModal(parseInt(openId, 10));
 });
 
 // ===== 加载专题分类 =====
@@ -53,6 +60,7 @@ async function loadTopicList() {
     if (currentTopicCode && currentTopicCode !== 'all') {
         params.topicCode = currentTopicCode;
     }
+    if (currentKeyword) params.keyword = currentKeyword;
 
     const result = await API.Topic.list(params);
     if (result.code !== 200) {
