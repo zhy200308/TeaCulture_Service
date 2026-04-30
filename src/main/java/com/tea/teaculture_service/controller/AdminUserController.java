@@ -43,14 +43,16 @@ public class AdminUserController {
                                                                @RequestParam(required = false) Integer status,
                                                                @RequestParam(defaultValue = "1") Long pageNum,
                                                                @RequestParam(defaultValue = "20") Long pageSize) {
+        log.info("判断权限");
         if (!UserContext.isAdmin()) {
+            log.error("无权限");
             return ApiResponse.forbidden("无权限");
         }
 
         LambdaQueryWrapper<SysUser> qw = new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getDeleted, false)
-                .eq(role != null && !role.isBlank(), SysUser::getRole, role.trim())
-                .eq(status != null, SysUser::getStatus, status == 1)
+                .eq(role != null && !role.isBlank(), SysUser::getRole, role)
+                .eq(status != null, SysUser::getStatus, status)
                 .and(keyword != null && !keyword.isBlank(),
                         w -> w.like(SysUser::getUsername, keyword).or().like(SysUser::getNickname, keyword))
                 .orderByDesc(SysUser::getCreateTime);
@@ -78,6 +80,7 @@ public class AdminUserController {
                 .setPageSize(pageSize);
         return ApiResponse.ok(resp);
     }
+
 
     @PutMapping("/{id}")
     public ApiResponse<Void> update(@PathVariable("id") Long id, @RequestBody AdminUserUpdateRequest req) {
