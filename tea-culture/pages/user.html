@@ -32,11 +32,30 @@
             border-radius: 6px; cursor: pointer;
         }
         .modal-btns button.primary { background: #4a7c59; color: #fff; border-color: #4a7c59; }
-        .fav-list { max-height: 400px; overflow-y: auto; }
-        .fav-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid #f0f0f0; }
-        .fav-type { background: #f0e6d8; color: #8b5a2b; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
-        .fav-title { flex: 1; }
-        .fav-item button { background: #ff5252; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .fav-list { max-height: 420px; overflow-y: auto; }
+        .fav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+        .fav-card { background: #fff; border: 1px solid #eee; border-radius: 12px; overflow: hidden; cursor: pointer; transition: all .2s; }
+        .fav-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.08); }
+        .fav-card-img { height: 110px; background: #f8f6f2; display: flex; align-items: center; justify-content: center; }
+        .fav-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .fav-card-img i { font-size: 34px; color: #8b5a2b; opacity: .75; }
+        .fav-card-body { padding: 10px; }
+        .fav-card-title { font-weight: 600; color: #333; font-size: 14px; line-height: 1.4; height: 40px; overflow: hidden; }
+        .fav-card-type { margin-top: 8px; display: inline-block; background: #f0e6d8; color: #8b5a2b; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .fav-card-actions { margin-top: 10px; display: flex; justify-content: flex-end; }
+        .fav-card-actions button { background: #ff5252; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+
+        .match-info { font-size: 15px; margin: 10px 0; line-height: 1.8; color: #333; }
+        .match-info strong { color: #8b5a2b; }
+        .note-box { background: #f8f6f2; border-left: 4px solid #d4a574; padding: 12px 15px; margin: 15px 0; border-radius: 8px; }
+        .note-box h4 { color: #8b5a2b; margin-bottom: 6px; font-size: 16px; }
+        .note-box p { color: #555; font-size: 14px; }
+        .param-section { margin-top: 18px; background: #f8f6f2; padding: 15px; border-radius: 10px; }
+        .param-section h4 { color: #8b5a2b; margin-bottom: 12px; font-size: 18px; }
+        .param-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .param-item { background: #fff; border-radius: 8px; padding: 12px; border: 1px solid #f0e6d8; }
+        .param-label { font-size: 12px; color: #888; margin-bottom: 6px; }
+        .param-value { font-size: 16px; font-weight: bold; color: #8b5a2b; }
     </style>
 </head>
 <body>

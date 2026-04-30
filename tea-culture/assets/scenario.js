@@ -95,28 +95,94 @@ async function openScenarioModal(id) {
     const param = result.data.brewingParam || {};
     currentParams = param;
 
-    let html = renderTextDetail(scenario.detailContent);
+    modalContent.innerHTML = renderScenarioDetail(scenario, param);
 
-    // 拼接冲泡参数 + 同步按钮
-    html += `
+    bindSyncButton();
+    appendFavoriteBtn(modalContent, 'scenario', id);
+}
+
+function renderScenarioDetail(scenario, param) {
+    const title = escapeHtml(scenario?.title || '');
+    const img = scenario?.coverImage ? `<img src="${scenario.coverImage}" alt="${title}" style="max-width:100%; border-radius:8px;">` : '';
+
+    const parsed = parseScenarioDetail(String(scenario?.detailContent || ''));
+    const toolsHtml = parsed.tools.length
+        ? parsed.tools.map(t => `<li>${escapeHtml(t)}</li>`).join('')
+        : '<li>—</li>';
+    const stepsHtml = parsed.steps.length
+        ? parsed.steps.map(step => `<li>${escapeHtml(step)}</li>`).join('')
+        : '<li>—</li>';
+    const tipsHtml = parsed.tips.length
+        ? parsed.tips.map(t => `<p>• ${escapeHtml(t)}</p>`).join('')
+        : '<p>• —</p>';
+
+    const paramHtml = `
         <div class="param-section">
             <h4>推荐冲泡参数</h4>
             <div class="param-grid">
-                <div class="param-item"><div class="param-label">茶类</div><div class="param-value">${param.teaType || '—'}</div></div>
-                <div class="param-item"><div class="param-label">投茶量</div><div class="param-value">${param.amount || '—'}</div></div>
-                <div class="param-item"><div class="param-label">水温</div><div class="param-value">${param.waterTemp || '—'}</div></div>
-                <div class="param-item"><div class="param-label">冲泡时长</div><div class="param-value">${param.brewTime || '—'}</div></div>
-                <div class="param-item"><div class="param-label">备注</div><div class="param-value">${param.note || '—'}</div></div>
+                <div class="param-item"><div class="param-label">茶类</div><div class="param-value">${escapeHtml(param?.teaType || '—')}</div></div>
+                <div class="param-item"><div class="param-label">投茶量</div><div class="param-value">${escapeHtml(param?.amount || '—')}</div></div>
+                <div class="param-item"><div class="param-label">水温</div><div class="param-value">${escapeHtml(param?.waterTemp || '—')}</div></div>
+                <div class="param-item"><div class="param-label">冲泡时长</div><div class="param-value">${escapeHtml(param?.brewTime || '—')}</div></div>
+                <div class="param-item"><div class="param-label">备注</div><div class="param-value">${escapeHtml(param?.note || '—')}</div></div>
             </div>
             <button class="sync-btn" id="syncDeviceBtn"><i class="fas fa-sync-alt"></i> 一键同步设备</button>
             <div class="sync-status" id="syncStatus"></div>
         </div>
     `;
 
-    modalContent.innerHTML = html;
+    return `
+        <h3>${title}</h3>
+        ${img}
+        <h4 class="step-title">准备工具</h4>
+        <ul class="step-list">${toolsHtml}</ul>
+        ${paramHtml}
+        <h4 class="step-title">冲泡步骤</h4>
+        <ul class="step-list">${stepsHtml}</ul>
+        <div class="tips-box"><h4>小贴士</h4>${tipsHtml}</div>
+    `;
+}
 
-    bindSyncButton();
-    appendFavoriteBtn(modalContent, 'scenario', id);
+function parseScenarioDetail(text) {
+    const src = (text || '').trim();
+    if (!src) return { tools: [], steps: [], tips: [] };
+
+    const norm = src.replace(/\r\n/g, '\n');
+
+    const toolIdx = norm.search(/工具[:：]/);
+    const stepIdx = norm.search(/步骤[:：]/);
+    const tipIdx = norm.search(/提示[:：]|小贴士[:：]/);
+
+    const seg = (start, end) => {
+        if (start < 0) return '';
+        const s = norm.slice(start).replace(/^(工具|步骤|提示|小贴士)[:：]\s*/, '');
+        if (end < 0) return s;
+        return norm.slice(start, end).replace(/^(工具|步骤|提示|小贴士)[:：]\s*/, '');
+    };
+
+    const toolsText = toolIdx >= 0 ? seg(toolIdx, stepIdx >= 0 ? stepIdx : tipIdx) : '';
+    const stepsText = stepIdx >= 0 ? seg(stepIdx, tipIdx) : '';
+    const tipsText = tipIdx >= 0 ? seg(tipIdx, -1) : '';
+
+    const splitTools = (s) => s
+        .split(/[、，,;；\n]/)
+        .map(x => x.trim())
+        .filter(Boolean);
+    const splitSteps = (s) => s
+        .replace(/->/g, '→')
+        .split(/[→\n;；。]/)
+        .map(x => x.trim())
+        .filter(Boolean);
+    const splitTips = (s) => s
+        .split(/[\n;；。]/)
+        .map(x => x.trim())
+        .filter(Boolean);
+
+    const tools = toolsText ? splitTools(toolsText) : [];
+    const steps = stepsText ? splitSteps(stepsText) : (toolIdx >= 0 || tipIdx >= 0 ? [] : splitSteps(norm));
+    const tips = tipsText ? splitTips(tipsText) : [];
+
+    return { tools, steps, tips };
 }
 
 function renderTextDetail(text) {

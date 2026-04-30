@@ -10,10 +10,11 @@
 
 let currentTeaType = 'all';
 let currentTeaParam = null;
+let allMatches = [];
+let teaTypeNameMap = {};
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await loadMatchList();
-    bindTabEvents();
+    await initTeaFood();
 
     if (window.mqttManager) {
         mqttManager.onStatusChange(updateDeviceStatusUI);
@@ -26,49 +27,72 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
+async function initTeaFood() {
+    await loadTeaTypesAndMatches();
+    renderTeaTabs();
+    bindTabEvents();
+    renderMatchList();
+}
+
+async function loadTeaTypesAndMatches() {
+    const listResp = await API.TeaFood.list({});
+    allMatches = listResp.code === 200 ? (listResp.data || []) : [];
+
+    const paramsResp = await API.TeaFood.listTeaTypeParams();
+    const params = paramsResp.code === 200 ? (paramsResp.data || []) : [];
+    teaTypeNameMap = {};
+    params.forEach(p => {
+        if (p && p.teaTypeCode) teaTypeNameMap[p.teaTypeCode] = p.teaTypeName || p.teaTypeCode;
+    });
+}
+
+function renderTeaTabs() {
+    const container = document.querySelector('.tea-tabs');
+    if (!container) return;
+
+    const codes = Array.from(new Set(allMatches.map(m => m.teaTypeCode).filter(Boolean)));
+    const tabs = [{ code: 'all', name: '全部茶类' }].concat(
+        codes.map(code => ({ code, name: teaTypeNameMap[code] || code }))
+    );
+
+    container.innerHTML = tabs.map(t => `
+        <div class="tea-btn ${t.code === currentTeaType ? 'active' : ''}" data-tea="${t.code}">${escapeHtml(t.name)}</div>
+    `).join('');
+}
+
 function bindTabEvents() {
     document.querySelectorAll('.tea-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
+        btn.addEventListener('click', () => {
             document.querySelectorAll('.tea-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentTeaType = btn.getAttribute('data-tea');
-            await loadMatchList();
+            renderMatchList();
         });
     });
 }
 
-// ===== 加载搭配列表 =====
-async function loadMatchList() {
+function renderMatchList() {
     const list = document.getElementById('matchList');
     if (!list) return;
 
-    const params = {};
-    if (currentTeaType && currentTeaType !== 'all') {
-        params.teaTypeCode = currentTeaType;
-    }
+    const records = currentTeaType === 'all'
+        ? allMatches
+        : allMatches.filter(m => m.teaTypeCode === currentTeaType);
 
-    const result = await API.TeaFood.list(params);
-    if (result.code !== 200) {
-        list.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">加载失败</p>';
-        return;
-    }
-
-    const records = result.data?.records || result.data || [];
-    if (records.length === 0) {
+    if (!records.length) {
         list.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">暂无搭配</p>';
         return;
     }
 
-    const teaNameMap = { green: '绿茶', black: '红茶', oolong: '乌龙茶', white: '白茶' };
     list.innerHTML = records.map(item => `
         <div class="match-card" data-tea="${item.teaTypeCode}">
             <div class="match-card-img">
                 <img src="${item.coverImage || ''}" alt="${item.title}">
             </div>
             <div class="match-card-content">
-                <span class="tea-tag">${teaNameMap[item.teaTypeCode] || item.teaName || ''}</span>
-                <h3>${item.title}</h3>
-                <p class="match-desc">${item.summary || ''}</p>
+                <span class="tea-tag">${escapeHtml(teaTypeNameMap[item.teaTypeCode] || item.teaName || item.teaTypeCode || '')}</span>
+                <h3>${escapeHtml(item.title || '')}</h3>
+                <p class="match-desc">${escapeHtml(item.summary || '')}</p>
                 <div class="detail-btn" onclick="openMatchModal(${item.id})">查看详情</div>
             </div>
         </div>
@@ -92,7 +116,7 @@ async function openMatchModal(id) {
     const param = result.data.teaTypeParam || {};
     currentTeaParam = param;
 
-    let html = renderTextDetail(match.detailContent);
+    let html = renderMatchDetail(match);
 
     // 拼接设备参数 + 同步按钮
     html += `
@@ -113,6 +137,57 @@ async function openMatchModal(id) {
 
     bindSyncButton();
     appendFavoriteBtn(modalContent, 'food', id);
+}
+
+function renderMatchDetail(match) {
+    const title = escapeHtml(match?.title || '');
+    const img = match?.coverImage ? `<img src="${match.coverImage}" alt="${title}">` : '';
+
+    const detail = String(match?.detailContent || '').trim();
+    if (!detail) {
+        return `
+            <h3>${title}</h3>
+            ${img}
+            <p style="text-align:center;color:#999;padding:20px;">暂无详情</p>
+        `;
+    }
+
+    const lines = detail.split('\n').map(s => s.trim()).filter(Boolean);
+
+    let matchTea = '';
+    let reason = '';
+    let suggest = '';
+    let tip = '';
+    const others = [];
+
+    lines.forEach(line => {
+        const m1 = line.match(/^适配茶品[:：]\s*(.*)$/);
+        const m2 = line.match(/^搭配理由[:：]\s*(.*)$/);
+        const m3 = line.match(/^食用建议[:：]\s*(.*)$/);
+        const m4 = line.match(/^小贴士[:：]\s*(.*)$/);
+        if (m1) matchTea = m1[1];
+        else if (m2) reason = m2[1];
+        else if (m3) suggest = m3[1];
+        else if (m4) tip = m4[1];
+        else others.push(line);
+    });
+
+    const info = [];
+    if (matchTea) info.push(`<p class="match-info"><strong>适配茶品</strong>：${escapeHtml(matchTea)}</p>`);
+    if (reason) info.push(`<p class="match-info"><strong>搭配理由</strong>：${escapeHtml(reason)}</p>`);
+    if (suggest) info.push(`<p class="match-info"><strong>食用建议</strong>：${escapeHtml(suggest)}</p>`);
+    others.forEach(t => info.push(`<p class="match-info">${escapeHtml(t)}</p>`));
+
+    const tipHtml = tip
+        ? `<div class="note-box"><h4>小贴士</h4><p>${escapeHtml(tip)}</p></div>`
+        : '';
+
+    return `
+        <h3>${title}</h3>
+        ${img}
+        ${info.join('')}
+        ${tipHtml}
+    `;
 }
 
 function renderTextDetail(text) {

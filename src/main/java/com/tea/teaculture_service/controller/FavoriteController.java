@@ -72,12 +72,14 @@ public class FavoriteController {
                         .orderByDesc(UserFavorite::getCreateTime));
 
         Map<String, Map<Long, String>> titleMap = buildTitleMap(page.getRecords());
+        Map<String, Map<Long, String>> coverMap = buildCoverMap(page.getRecords());
 
         List<FavoriteItem> items = page.getRecords().stream().map(f -> new FavoriteItem()
                 .setId(f.getId())
                 .setTargetType(f.getTargetType())
                 .setTargetId(f.getTargetId())
-                .setTargetTitle(titleMap.getOrDefault(f.getTargetType(), Collections.emptyMap()).get(f.getTargetId())))
+                .setTargetTitle(titleMap.getOrDefault(f.getTargetType(), Collections.emptyMap()).get(f.getTargetId()))
+                .setTargetCoverImage(coverMap.getOrDefault(f.getTargetType(), Collections.emptyMap()).get(f.getTargetId())))
                 .toList();
 
         PageResponse<FavoriteItem> resp = new PageResponse<FavoriteItem>()
@@ -162,6 +164,34 @@ public class FavoriteController {
                 map.put(type, teaScenarioService.listByIds(ids).stream().collect(Collectors.toMap(TeaScenario::getId, TeaScenario::getTitle, (a, b) -> a)));
             } else if ("food".equals(type)) {
                 map.put(type, teaFoodMatchService.listByIds(ids).stream().collect(Collectors.toMap(TeaFoodMatch::getId, TeaFoodMatch::getTitle, (a, b) -> a)));
+            } else {
+                map.put(type, Collections.emptyMap());
+            }
+        }
+        return map;
+    }
+
+    private Map<String, Map<Long, String>> buildCoverMap(List<UserFavorite> favorites) {
+        Map<String, List<Long>> grouped = favorites.stream()
+                .filter(f -> f.getTargetType() != null && f.getTargetId() != null)
+                .collect(Collectors.groupingBy(UserFavorite::getTargetType, Collectors.mapping(UserFavorite::getTargetId, Collectors.toList())));
+
+        Map<String, Map<Long, String>> map = new HashMap<>();
+        for (Map.Entry<String, List<Long>> entry : grouped.entrySet()) {
+            String type = entry.getKey();
+            List<Long> ids = entry.getValue().stream().filter(Objects::nonNull).distinct().toList();
+            if (ids.isEmpty()) {
+                map.put(type, Collections.emptyMap());
+                continue;
+            }
+            if ("knowledge".equals(type)) {
+                map.put(type, teaKnowledgeService.listByIds(ids).stream().collect(Collectors.toMap(TeaKnowledge::getId, TeaKnowledge::getCoverImage, (a, b) -> a)));
+            } else if ("topic".equals(type)) {
+                map.put(type, teaTopicService.listByIds(ids).stream().collect(Collectors.toMap(TeaTopic::getId, TeaTopic::getCoverImage, (a, b) -> a)));
+            } else if ("scenario".equals(type)) {
+                map.put(type, teaScenarioService.listByIds(ids).stream().collect(Collectors.toMap(TeaScenario::getId, TeaScenario::getCoverImage, (a, b) -> a)));
+            } else if ("food".equals(type)) {
+                map.put(type, teaFoodMatchService.listByIds(ids).stream().collect(Collectors.toMap(TeaFoodMatch::getId, TeaFoodMatch::getCoverImage, (a, b) -> a)));
             } else {
                 map.put(type, Collections.emptyMap());
             }

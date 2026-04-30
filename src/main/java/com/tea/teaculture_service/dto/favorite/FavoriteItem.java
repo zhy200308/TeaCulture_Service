@@ -16,4 +16,5 @@ public class FavoriteItem {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long targetId;
     private String targetTitle;
+    private String targetCoverImage;
 }

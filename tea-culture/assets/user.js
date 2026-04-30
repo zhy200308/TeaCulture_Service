@@ -189,16 +189,27 @@ async function showFavoriteModal() {
     const records = result.data?.records || result.data || [];
 
     const typeMap = { knowledge: '茶识', topic: '专题', scenario: '教程', food: '茶食搭配' };
+    const iconMap = { knowledge: 'fa-book', topic: 'fa-layer-group', scenario: 'fa-mug-hot', food: 'fa-utensils' };
     const items = records.length === 0
         ? '<p style="text-align:center;color:#999;padding:30px;">暂无收藏</p>'
-        : records.map(f => `
-            <div class="fav-item">
-                <span class="fav-type">${typeMap[f.targetType] || f.targetType}</span>
-                <span class="fav-title" style="cursor:pointer;" onclick="openFavoriteDetail('${f.targetType}', ${f.targetId})">${f.targetTitle || ''}</span>
-                <button onclick="openFavoriteDetail('${f.targetType}', ${f.targetId})" style="background:#4a7c59;">查看</button>
-                <button onclick="removeFavorite('${f.targetType}', ${f.targetId}, this)">取消</button>
+        : `
+            <div class="fav-grid">
+                ${records.map(f => `
+                    <div class="fav-card" onclick="openFavoriteDetail('${f.targetType}', ${f.targetId})">
+                        <div class="fav-card-img">
+                            ${f.targetCoverImage ? `<img src="${f.targetCoverImage}" alt="">` : `<i class="fas ${iconMap[f.targetType] || 'fa-heart'}"></i>`}
+                        </div>
+                        <div class="fav-card-body">
+                            <div class="fav-card-title">${escapeHtml(f.targetTitle || '')}</div>
+                            <div class="fav-card-type">${typeMap[f.targetType] || f.targetType}</div>
+                            <div class="fav-card-actions">
+                                <button onclick="event.stopPropagation();removeFavorite('${f.targetType}', ${f.targetId}, this)">取消</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
             </div>
-        `).join('');
+        `;
 
     const html = `
         <div class="user-modal-mask" onclick="closeUserModal(event)">
@@ -218,7 +229,7 @@ window.removeFavorite = async function (targetType, targetId, btn) {
     if (!confirm('确定要取消收藏吗？')) return;
     const result = await API.Favorite.remove(targetType, targetId);
     if (result.code === 200) {
-        const item = btn && btn.closest ? btn.closest('.fav-item') : null;
+        const item = btn && btn.closest ? (btn.closest('.fav-card') || btn.closest('.fav-item')) : null;
         if (item) item.remove();
         else closeUserModal();
     } else {
@@ -258,40 +269,142 @@ window.openFavoriteDetail = async function (targetType, targetId) {
     if (targetType === 'scenario') {
         const scenario = result.data.scenario || result.data;
         const param = result.data.brewingParam || {};
-        box.innerHTML = `
-            <h4 style="margin:10px 0;color:#4a7c59;">${scenario.title || ''}</h4>
-            ${renderTextDetail(scenario.detailContent)}
-            <div style="margin-top:15px;background:#f8f6f2;border-radius:10px;padding:12px;">
-                <div style="font-weight:600;color:#4a7c59;margin-bottom:8px;">推荐冲泡参数</div>
-                <div>茶类：${param.teaType || '—'}</div>
-                <div>投茶量：${param.amount || '—'}</div>
-                <div>水温：${param.waterTemp || '—'}</div>
-                <div>冲泡时长：${param.brewTime || '—'}</div>
-                <div>备注：${param.note || '—'}</div>
-            </div>
-        `;
+        box.innerHTML = renderScenarioDetail(scenario, param);
     } else if (targetType === 'food') {
         const match = result.data.match || result.data;
         const param = result.data.teaTypeParam || {};
-        box.innerHTML = `
-            <h4 style="margin:10px 0;color:#4a7c59;">${match.title || ''}</h4>
-            ${renderTextDetail(match.detailContent)}
-            <div style="margin-top:15px;background:#f8f6f2;border-radius:10px;padding:12px;">
-                <div style="font-weight:600;color:#4a7c59;margin-bottom:8px;">智能茶器参数推荐</div>
-                <div>水温：${param.waterTemp || '—'}</div>
-                <div>投茶量：${param.amount || '—'}</div>
-                <div>冲泡时长：${param.brewTime || '—'}</div>
-                <div>备注：${param.note || '—'}</div>
-            </div>
-        `;
+        box.innerHTML = renderTeaFoodDetail(match, param);
     } else {
         const data = result.data;
-        box.innerHTML = `
-            <h4 style="margin:10px 0;color:#4a7c59;">${data.title || ''}</h4>
-            ${renderTextDetail(data.detailContent)}
-        `;
+        box.innerHTML = renderCommonDetail(data);
     }
 };
+
+function renderCommonDetail(data) {
+    const title = escapeHtml(data?.title || '');
+    const img = data?.coverImage ? `<img src="${data.coverImage}" alt="${title}" style="max-width:100%; border-radius:8px;">` : '';
+    return `
+        <h3 style="text-align:center;color:#8b5a2b;margin:0 0 18px;">${title}</h3>
+        ${img}
+        ${renderTextDetail(data?.detailContent)}
+    `;
+}
+
+function renderTeaFoodDetail(match, param) {
+    const title = escapeHtml(match?.title || '');
+    const img = match?.coverImage ? `<img src="${match.coverImage}" alt="${title}" style="max-width:100%; border-radius:8px;">` : '';
+    const detail = String(match?.detailContent || '').trim();
+    const lines = detail ? detail.split('\n').map(s => s.trim()).filter(Boolean) : [];
+
+    let matchTea = '';
+    let reason = '';
+    let suggest = '';
+    let tip = '';
+    const others = [];
+
+    lines.forEach(line => {
+        const m1 = line.match(/^适配茶品[:：]\s*(.*)$/);
+        const m2 = line.match(/^搭配理由[:：]\s*(.*)$/);
+        const m3 = line.match(/^食用建议[:：]\s*(.*)$/);
+        const m4 = line.match(/^小贴士[:：]\s*(.*)$/);
+        if (m1) matchTea = m1[1];
+        else if (m2) reason = m2[1];
+        else if (m3) suggest = m3[1];
+        else if (m4) tip = m4[1];
+        else others.push(line);
+    });
+
+    const info = [];
+    if (matchTea) info.push(`<p class="match-info"><strong>适配茶品</strong>：${escapeHtml(matchTea)}</p>`);
+    if (reason) info.push(`<p class="match-info"><strong>搭配理由</strong>：${escapeHtml(reason)}</p>`);
+    if (suggest) info.push(`<p class="match-info"><strong>食用建议</strong>：${escapeHtml(suggest)}</p>`);
+    others.forEach(t => info.push(`<p class="match-info">${escapeHtml(t)}</p>`));
+
+    const tipHtml = tip ? `<div class="note-box"><h4>小贴士</h4><p>${escapeHtml(tip)}</p></div>` : '';
+
+    const paramHtml = `
+        <div class="param-section">
+            <h4>智能茶器参数推荐</h4>
+            <div class="param-grid">
+                <div class="param-item"><div class="param-label">水温</div><div class="param-value">${escapeHtml(param?.waterTemp || '—')}</div></div>
+                <div class="param-item"><div class="param-label">投茶量</div><div class="param-value">${escapeHtml(param?.amount || '—')}</div></div>
+                <div class="param-item"><div class="param-label">冲泡时长</div><div class="param-value">${escapeHtml(param?.brewTime || '—')}</div></div>
+                <div class="param-item"><div class="param-label">备注</div><div class="param-value">${escapeHtml(param?.note || '—')}</div></div>
+            </div>
+        </div>
+    `;
+
+    return `
+        <h3 style="text-align:center;color:#8b5a2b;margin:0 0 18px;">${title}</h3>
+        ${img}
+        ${detail ? info.join('') : renderTextDetail(detail)}
+        ${tipHtml}
+        ${paramHtml}
+    `;
+}
+
+function renderScenarioDetail(scenario, param) {
+    const title = escapeHtml(scenario?.title || '');
+    const img = scenario?.coverImage ? `<img src="${scenario.coverImage}" alt="${title}" style="max-width:100%; border-radius:8px;">` : '';
+    const parsed = parseScenarioDetail(String(scenario?.detailContent || ''));
+    const toolsHtml = parsed.tools.length ? parsed.tools.map(t => `<li>${escapeHtml(t)}</li>`).join('') : '<li>—</li>';
+    const stepsHtml = parsed.steps.length ? parsed.steps.map(t => `<li>${escapeHtml(t)}</li>`).join('') : '<li>—</li>';
+    const tipsHtml = parsed.tips.length ? parsed.tips.map(t => `<p>• ${escapeHtml(t)}</p>`).join('') : '<p>• —</p>';
+
+    const paramHtml = `
+        <div class="param-section">
+            <h4>推荐冲泡参数</h4>
+            <div class="param-grid">
+                <div class="param-item"><div class="param-label">茶类</div><div class="param-value">${escapeHtml(param?.teaType || '—')}</div></div>
+                <div class="param-item"><div class="param-label">投茶量</div><div class="param-value">${escapeHtml(param?.amount || '—')}</div></div>
+                <div class="param-item"><div class="param-label">水温</div><div class="param-value">${escapeHtml(param?.waterTemp || '—')}</div></div>
+                <div class="param-item"><div class="param-label">冲泡时长</div><div class="param-value">${escapeHtml(param?.brewTime || '—')}</div></div>
+                <div class="param-item"><div class="param-label">备注</div><div class="param-value">${escapeHtml(param?.note || '—')}</div></div>
+            </div>
+        </div>
+    `;
+
+    return `
+        <h3 style="text-align:center;color:#8b5a2b;margin:0 0 18px;">${title}</h3>
+        ${img}
+        <h4 style="color:#8b5a2b;margin:18px 0 10px;">准备工具</h4>
+        <ul style="padding-left:18px;color:#555;line-height:1.9;">${toolsHtml}</ul>
+        ${paramHtml}
+        <h4 style="color:#8b5a2b;margin:18px 0 10px;">冲泡步骤</h4>
+        <ul style="padding-left:18px;color:#555;line-height:1.9;">${stepsHtml}</ul>
+        <div class="note-box"><h4>小贴士</h4>${tipsHtml}</div>
+    `;
+}
+
+function parseScenarioDetail(text) {
+    const src = (text || '').trim();
+    if (!src) return { tools: [], steps: [], tips: [] };
+
+    const norm = src.replace(/\r\n/g, '\n');
+    const toolIdx = norm.search(/工具[:：]/);
+    const stepIdx = norm.search(/步骤[:：]/);
+    const tipIdx = norm.search(/提示[:：]|小贴士[:：]/);
+
+    const seg = (start, end) => {
+        if (start < 0) return '';
+        if (end < 0) return norm.slice(start).replace(/^(工具|步骤|提示|小贴士)[:：]\s*/, '');
+        return norm.slice(start, end).replace(/^(工具|步骤|提示|小贴士)[:：]\s*/, '');
+    };
+
+    const toolsText = toolIdx >= 0 ? seg(toolIdx, stepIdx >= 0 ? stepIdx : tipIdx) : '';
+    const stepsText = stepIdx >= 0 ? seg(stepIdx, tipIdx) : '';
+    const tipsText = tipIdx >= 0 ? seg(tipIdx, -1) : '';
+
+    const splitTools = (s) => s.split(/[、，,;；\n]/).map(x => x.trim()).filter(Boolean);
+    const splitSteps = (s) => s.replace(/->/g, '→').split(/[→\n;；。]/).map(x => x.trim()).filter(Boolean);
+    const splitTips = (s) => s.split(/[\n;；。]/).map(x => x.trim()).filter(Boolean);
+
+    const tools = toolsText ? splitTools(toolsText) : [];
+    const steps = stepsText ? splitSteps(stepsText) : (toolIdx >= 0 || tipIdx >= 0 ? [] : splitSteps(norm));
+    const tips = tipsText ? splitTips(tipsText) : [];
+
+    return { tools, steps, tips };
+}
 
 function renderTextDetail(text) {
     const t = (text || '').trim();
