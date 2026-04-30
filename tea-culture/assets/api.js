@@ -83,8 +83,23 @@ async function request(url, options = {}) {
 const http = {
     get(url, params) {
         if (params) {
-            const qs = new URLSearchParams(params).toString();
-            url += (url.includes('?') ? '&' : '?') + qs;
+            const sp = new URLSearchParams();
+            Object.keys(params).forEach(k => {
+                const v = params[k];
+                if (v === undefined || v === null || v === '') return;
+                if (Array.isArray(v)) {
+                    v.forEach(item => {
+                        if (item === undefined || item === null || item === '') return;
+                        sp.append(k, String(item));
+                    });
+                } else {
+                    sp.append(k, String(v));
+                }
+            });
+            const qs = sp.toString();
+            if (qs) {
+                url += (url.includes('?') ? '&' : '?') + qs;
+            }
         }
         return request(url, { method: 'GET' });
     },
