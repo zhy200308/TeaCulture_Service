@@ -610,6 +610,10 @@ const AdminFavoriteAPI = {
         return http.get('/admin/favorites', params);
     },
 
+    detail(id) {
+        return http.get(`/admin/favorites/${id}/detail`);
+    },
+
     delete(id) {
         return http.delete(`/admin/favorites/${id}`);
     },
@@ -622,6 +626,10 @@ const AdminFavoriteAPI = {
 const AdminDeviceCommandAPI = {
     list(params = {}) {
         return http.get('/admin/device-commands', params);
+    },
+
+    detail(id) {
+        return http.get(`/admin/device-commands/${id}`);
     },
 
     delete(id) {

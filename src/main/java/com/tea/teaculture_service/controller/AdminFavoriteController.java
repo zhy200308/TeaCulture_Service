@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tea.teaculture_service.dto.ApiResponse;
 import com.tea.teaculture_service.dto.PageResponse;
 import com.tea.teaculture_service.dto.common.IdListRequest;
+import com.tea.teaculture_service.dto.favorite.FavoriteAdminDetailResponse;
 import com.tea.teaculture_service.dto.favorite.FavoriteAdminItem;
 import com.tea.teaculture_service.entity.SysUser;
 import com.tea.teaculture_service.entity.TeaFoodMatch;
@@ -116,6 +117,82 @@ public class AdminFavoriteController {
                 .setTotal(page.getTotal())
                 .setPageNum(pageNum)
                 .setPageSize(pageSize);
+        return ApiResponse.ok(resp);
+    }
+
+    @GetMapping("/{id}/detail")
+    public ApiResponse<FavoriteAdminDetailResponse> detail(@PathVariable("id") Long id) {
+        if (!UserContext.isAdmin()) {
+            return ApiResponse.forbidden("无权限");
+        }
+        UserFavorite fav = userFavoriteService.getOne(new LambdaQueryWrapper<UserFavorite>()
+                .eq(UserFavorite::getId, id)
+                .eq(UserFavorite::getDeleted, false)
+                .last("limit 1"));
+        if (fav == null) {
+            return ApiResponse.fail("记录不存在");
+        }
+
+        SysUser user = fav.getUserId() == null ? null : sysUserService.getById(fav.getUserId());
+        FavoriteAdminDetailResponse resp = new FavoriteAdminDetailResponse()
+                .setId(fav.getId())
+                .setUserId(fav.getUserId())
+                .setUsername(user == null ? null : user.getUsername())
+                .setTargetType(fav.getTargetType())
+                .setTargetId(fav.getTargetId())
+                .setCreateTime(fav.getCreateTime());
+
+        if (fav.getTargetType() == null || fav.getTargetId() == null) {
+            return ApiResponse.ok(resp);
+        }
+
+        if ("knowledge".equals(fav.getTargetType())) {
+            TeaKnowledge k = teaKnowledgeService.getOne(new LambdaQueryWrapper<TeaKnowledge>()
+                    .eq(TeaKnowledge::getId, fav.getTargetId())
+                    .eq(TeaKnowledge::getDeleted, false)
+                    .last("limit 1"));
+            if (k != null) {
+                resp.setTargetTitle(k.getTitle())
+                        .setTargetSummary(k.getSummary())
+                        .setTargetCoverImage(k.getCoverImage())
+                        .setTargetDetailContent(k.getDetailContent());
+            }
+        } else if ("topic".equals(fav.getTargetType())) {
+            TeaTopic t = teaTopicService.getOne(new LambdaQueryWrapper<TeaTopic>()
+                    .eq(TeaTopic::getId, fav.getTargetId())
+                    .eq(TeaTopic::getDeleted, false)
+                    .last("limit 1"));
+            if (t != null) {
+                resp.setTargetTitle(t.getTitle())
+                        .setTargetSummary(t.getSummary())
+                        .setTargetCoverImage(t.getCoverImage())
+                        .setTargetDetailContent(t.getDetailContent())
+                        .setTargetAudioUrl(t.getAudioUrl());
+            }
+        } else if ("scenario".equals(fav.getTargetType())) {
+            TeaScenario s = teaScenarioService.getOne(new LambdaQueryWrapper<TeaScenario>()
+                    .eq(TeaScenario::getId, fav.getTargetId())
+                    .eq(TeaScenario::getDeleted, false)
+                    .last("limit 1"));
+            if (s != null) {
+                resp.setTargetTitle(s.getTitle())
+                        .setTargetSummary(s.getSummary())
+                        .setTargetCoverImage(s.getCoverImage())
+                        .setTargetDetailContent(s.getDetailContent());
+            }
+        } else if ("food".equals(fav.getTargetType())) {
+            TeaFoodMatch m = teaFoodMatchService.getOne(new LambdaQueryWrapper<TeaFoodMatch>()
+                    .eq(TeaFoodMatch::getId, fav.getTargetId())
+                    .eq(TeaFoodMatch::getDeleted, false)
+                    .last("limit 1"));
+            if (m != null) {
+                resp.setTargetTitle(m.getTitle())
+                        .setTargetSummary(m.getSummary())
+                        .setTargetCoverImage(m.getCoverImage())
+                        .setTargetDetailContent(m.getDetailContent());
+            }
+        }
+
         return ApiResponse.ok(resp);
     }
 

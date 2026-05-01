@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tea.teaculture_service.dto.ApiResponse;
 import com.tea.teaculture_service.dto.PageResponse;
 import com.tea.teaculture_service.dto.common.IdListRequest;
+import com.tea.teaculture_service.dto.device.DeviceCommandAdminDetail;
 import com.tea.teaculture_service.dto.device.DeviceCommandAdminItem;
 import com.tea.teaculture_service.entity.DeviceCommandLog;
 import com.tea.teaculture_service.entity.SysUser;
@@ -99,6 +100,35 @@ public class AdminDeviceCommandController {
                 .setPageNum(pageNum)
                 .setPageSize(pageSize);
         return ApiResponse.ok(resp);
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<DeviceCommandAdminDetail> detail(@PathVariable("id") Long id) {
+        if (!UserContext.isAdmin()) {
+            return ApiResponse.forbidden("无权限");
+        }
+        DeviceCommandLog log = deviceCommandLogService.getById(id);
+        if (log == null) {
+            return ApiResponse.fail("记录不存在");
+        }
+        SysUser user = log.getUserId() == null ? null : sysUserService.getById(log.getUserId());
+        DeviceCommandAdminDetail d = new DeviceCommandAdminDetail()
+                .setId(log.getId())
+                .setUserId(log.getUserId())
+                .setUsername(user == null ? null : user.getUsername())
+                .setDeviceId(log.getDeviceId())
+                .setCommandType(log.getCommandType())
+                .setTopic(log.getTopic())
+                .setTeaType(log.getTeaType())
+                .setAmount(toInt(log.getAmount()))
+                .setWaterTemp(toInt(log.getWaterTemp()))
+                .setBrewTime(toInt(log.getBrewTime()))
+                .setNote(log.getNote())
+                .setPayload(log.getPayload())
+                .setResult(log.getResult())
+                .setErrorMsg(log.getErrorMsg())
+                .setCreateTime(log.getCreateTime());
+        return ApiResponse.ok(d);
     }
 
     private static Integer toInt(String s) {

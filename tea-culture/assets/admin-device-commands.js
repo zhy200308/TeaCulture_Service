@@ -77,7 +77,6 @@ async function load() {
                 </td>
             </tr>
         `).join('');
-        window.__deviceLogMap = new Map(records.map(r => [String(r.id), r]));
     }
 
     const total = result.data?.total || 0;
@@ -95,11 +94,26 @@ function changePage(delta) {
 }
 
 window.viewDetail = function (id) {
-    const item = window.__deviceLogMap ? window.__deviceLogMap.get(String(id)) : null;
-    if (!item) return;
+    viewDetailAsync(id);
+};
+
+async function viewDetailAsync(id) {
+    const r = await API.AdminDeviceCommand.detail(id);
+    if (!r || r.code !== 200 || !r.data) {
+        alert(r?.message || '加载失败');
+        return;
+    }
+    const item = r.data;
+    const payload = String(item.payload || '').trim();
+    const prettyPayload = tryPrettyJson(payload);
+    const payloadHtml = payload
+        ? `<pre style="white-space:pre-wrap;word-break:break-word;background:#f8f6f2;border-radius:8px;padding:10px;border:1px solid #f0e6d8;max-height:320px;overflow:auto;">${escapeHtml(prettyPayload)}</pre>`
+        : '<div style="color:#999;">无</div>';
+
     AdminCommon.openModal('日志详情', `
         <div style="color:#555;line-height:1.8;">
             <div><b>ID：</b>${item.id}</div>
+            <div><b>时间：</b>${escapeHtml(item.createTime || '')}</div>
             <div><b>用户：</b>${escapeHtml(item.username || '')} (${item.userId || ''})</div>
             <div><b>设备ID：</b>${escapeHtml(item.deviceId || '')}</div>
             <div><b>指令类型：</b>${escapeHtml(item.commandType || '')}</div>
@@ -110,11 +124,14 @@ window.viewDetail = function (id) {
             <div><b>冲泡时长：</b>${item.brewTime == null ? '' : item.brewTime}</div>
             <div><b>结果：</b>${item.result == null ? '' : item.result}</div>
             <div><b>错误信息：</b>${escapeHtml(item.errorMsg || '')}</div>
+            <div><b>备注：</b>${escapeHtml(item.note || '')}</div>
+            <div style="margin-top:10px;"><b>Payload：</b></div>
+            ${payloadHtml}
         </div>
     `, () => closeModal());
     const saveBtn = document.getElementById('modalSaveBtn');
     if (saveBtn) saveBtn.innerText = '关闭';
-};
+}
 
 window.deleteRow = async function (id) {
     if (!confirm('确定删除该记录吗？')) return;
@@ -137,4 +154,13 @@ async function batchDelete() {
 
 function escapeHtml(str) {
     return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function tryPrettyJson(text) {
+    if (!text) return '';
+    try {
+        return JSON.stringify(JSON.parse(text), null, 2);
+    } catch (e) {
+        return text;
+    }
 }

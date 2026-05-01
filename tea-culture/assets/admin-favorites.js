@@ -69,6 +69,7 @@ async function load() {
                 <td>${escapeHtml(f.targetTitle || '')}</td>
                 <td>
                     <div class="row-actions">
+                        <button class="btn light" onclick="viewDetail('${f.id}')">详情</button>
                         <button class="btn danger" onclick="deleteRow('${f.id}')">删除</button>
                     </div>
                 </td>
@@ -97,6 +98,37 @@ window.deleteRow = async function (id) {
     else alert(r.message || '删除失败');
 };
 
+window.viewDetail = async function (id) {
+    const r = await API.AdminFavorite.detail(id);
+    if (!r || r.code !== 200 || !r.data) {
+        alert(r?.message || '加载失败');
+        return;
+    }
+    const d = r.data;
+    const cover = normalizeImageUrl(d.targetCoverImage);
+    const coverHtml = cover ? `<img src="${cover}" alt="" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;border:1px solid #eee;">` : '';
+    const detail = String(d.targetDetailContent || '').trim();
+    const detailHtml = detail
+        ? `<pre style="white-space:pre-wrap;word-break:break-word;background:#f8f6f2;border-radius:8px;padding:10px;border:1px solid #f0e6d8;max-height:360px;overflow:auto;">${escapeHtml(detail)}</pre>`
+        : '<div style="color:#999;">无详情内容</div>';
+
+    AdminCommon.openModal('收藏内容详情', `
+        <div style="color:#555;line-height:1.8;">
+            <div><b>收藏ID：</b>${d.id}</div>
+            <div><b>用户：</b>${escapeHtml(d.username || '')} (${d.userId || ''})</div>
+            <div><b>类型：</b>${escapeHtml(d.targetType || '')}</div>
+            <div><b>目标ID：</b>${d.targetId || ''}</div>
+            <div style="margin-top:10px;"><b>标题：</b>${escapeHtml(d.targetTitle || '')}</div>
+            <div><b>摘要：</b>${escapeHtml(d.targetSummary || '')}</div>
+            ${coverHtml ? `<div style="margin-top:10px;">${coverHtml}</div>` : ''}
+            <div style="margin-top:10px;"><b>详情：</b></div>
+            ${detailHtml}
+        </div>
+    `, () => closeModal());
+    const saveBtn = document.getElementById('modalSaveBtn');
+    if (saveBtn) saveBtn.innerText = '关闭';
+};
+
 async function batchDelete() {
     const ids = AdminCommon.getCheckedIds('rowId');
     if (!ids.length) {
@@ -111,4 +143,12 @@ async function batchDelete() {
 
 function escapeHtml(str) {
     return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function normalizeImageUrl(url) {
+    const u = String(url || '').trim();
+    if (!u) return '';
+    if (u.startsWith('./images/')) return `../images/${u.slice('./images/'.length)}`;
+    if (u.startsWith('/images/')) return `..${u}`;
+    return u;
 }
