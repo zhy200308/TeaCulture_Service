@@ -27,7 +27,7 @@ header {
 }
 
 .nav-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
     height: 70px;
@@ -65,7 +65,7 @@ header {
 
 /* 内容 */
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 30px auto;
     padding: 0 20px;
     display: grid;

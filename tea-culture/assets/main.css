@@ -25,7 +25,7 @@ header {
     z-index: 999;
 }
 .nav-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
@@ -44,7 +44,7 @@ header {
 .nav-menu {
     display: flex;
     gap: 30px;
-}
+                }
 .nav-menu a {
     font-size: 16px;
     color: #555;
@@ -99,7 +99,7 @@ header {
 
 /* 轮播图 */
 .carousel {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 30px auto;
     height: 450px;
     overflow: hidden;
@@ -173,7 +173,7 @@ header {
 
 /* 模块 */
 .module-section {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 40px 20px;
 }

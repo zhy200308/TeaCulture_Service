@@ -30,7 +30,7 @@ header {
 }
 
 .nav-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
@@ -103,7 +103,7 @@ header {
 
 /* 个人中心布局 */
 .user-center-wrap {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 40px auto;
     padding: 0 30px;
     display: grid;

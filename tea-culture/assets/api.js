@@ -14,6 +14,7 @@
 
 // ===================== 配置 =====================
 const API_BASE_URL = 'http://localhost:8080/api';
+// const API_BASE_URL = 'http://tea-bk.xskjhy.top:8080/api';
 const TOKEN_KEY = 'tea_token';
 const USER_INFO_KEY = 'tea_user_info';
 
